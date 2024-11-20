@@ -306,7 +306,7 @@
             document.getElementById('tickboxSection').style.display = 'none';
 
             // Prepare WhatsApp share link
-            const whatsappMessage = `*I just discovered my death date!*\n*Name:* ${name}\n*Age at death:* ${deathAge}\n*Dying date:* ${deathDate.toLocaleDateString()}\n*Reason:* ${reason}\n*Time Left:* ${minutesLeft.toFixed(0)} *minutes*`;
+            const whatsappMessage = `*I just discovered my death date!*\n*Name:* ${name}\n*Age at death:* ${deathAge}\n*Dying date:* ${deathDate.toLocaleDateString()}\n*Reason:* ${reason}\n*Time Left:* ${minutesLeft.toFixed(0)} *minutes*\n*Are you dare to see the date you are going to die...*\nhttps://sanukanimnal.github.io/crazy_games/index.html`;
             document.getElementById('shareButton').href = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`;
         });
     </script>
