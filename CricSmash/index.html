@@ -344,7 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function loadImage(side, player) {
     if (!player) return; // Prevents errors if player data is missing
 
-    document.getElementById(`${side}-img`).src = `images/${player.name.replace(/\s+/g, '_')}/1.jpg`;
+document.getElementById(`${side}-img`).src = `https://sanukanimnal.github.io/crazy_games/CricSmash/images/${player.name.replace(/\s+/g, '_')}/1.jpg`;
     document.getElementById(`${side}-name`).textContent = player.name;
     document.getElementById(`${side}-country`).textContent = player.country;
 }
