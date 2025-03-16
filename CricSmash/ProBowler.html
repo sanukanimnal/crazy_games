@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bowling Speed Calculator</title>
+    <link rel="icon" type="image/x-icon" href="pic.png">
+
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background-color: #1e1e1e;
+    color: #fff;
+    overflow: hidden; /* Prevent scrolling */
+    height: 100vh; /* Full viewport height */
+}
+        h1 {
+            color: #00ff00;
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        .video-container {
+    position: relative;
+    width: 80%;
+    max-width: 600px;
+    margin: 10px auto;
+    background: black;
+    border-radius: 10px;
+    overflow: hidden;
+}
+        video {
+            width: 100%;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        .controls button {
+            margin: 5px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #00ff00;
+            border: none;
+            color: black;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .controls button:hover {
+            background-color: #00cc00;
+        }
+        .timeline {
+            width: 80%;
+            max-width: 600px;
+            margin: 10px auto;
+            height: 10px;
+            background-color: #333;
+            border-radius: 5px;
+            position: relative;
+        }
+        .timeline input {
+            width: 100%;
+            background-color: transparent;
+            border: none;
+            height: 100%;
+            cursor: pointer;
+        }
+        .timeline .marker {
+            position: absolute;
+            top: -5px;
+            width: 2px;
+            height: 20px;
+            background-color: #ff00ff;
+            transition: left 0.2s ease;
+        }
+        .result {
+            font-size: 20px;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #ff00ff;
+        }
+        footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 0px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-size: 14px;
+    left:0;
+}
+
+        
+        /* Media Queries for responsiveness */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+            .video-container {
+                width: 90%;
+            }
+            .controls button {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+            .timeline {
+                width: 90%;
+            }
+            .result {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2em;
+            }
+            .video-container {
+                width: 100%;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            .controls button {
+                width: 100%;
+                padding: 12px;
+                font-size: 1.1em;
+                margin: 5px 0;
+            }
+            .timeline {
+                width: 95%;
+            }
+            .result {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Bowling Speed Calculator</h1>
+    <input type="file" id="videoInput" accept="video/*">
+    <br>
+    <div class="video-container">
+        <video id="video"></video>
+    </div>
+    <div class="timeline">
+        <input type="range" id="timeline" min="0" value="0" step="0.1">
+        <div id="releaseMarker" class="marker" style="display:none;"></div>
+        <div id="impactMarker" class="marker" style="display:none;"></div>
+    </div>
+    <div class="controls">
+        <button id="playPauseButton" onclick="togglePlayPause()">Play</button>
+        <button onclick="setReleaseTime()">Mark Release Point</button>
+        <button onclick="setImpactTime()">Mark Impact Point</button>
+    </div>
+    <label for="distance">Pitch Distance (meters):</label>
+    <input type="number" id="distance" value="20.12">
+    <br>
+    <button onclick="calculateSpeed()">Calculate Speed</button>
+    <div class="result" id="speedResult"></div>
+    <footer>Bowling Speed Calculator 2025<sup>&copy</sup>- Powered by Sanuka Nimnal</footer>
+
+    <script>
+        let releaseTime = null;
+        let impactTime = null;
+        const video = document.getElementById("video");
+        const videoInput = document.getElementById("videoInput");
+        const timeline = document.getElementById("timeline");
+        const playPauseButton = document.getElementById("playPauseButton");
+        const releaseMarker = document.getElementById("releaseMarker");
+        const impactMarker = document.getElementById("impactMarker");
+
+        videoInput.addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                video.src = url;
+                video.load();
+                video.playbackRate = 0.075;
+                video.controls = false;
+                video.loop = false; // Remove looping to test full play
+                video.onloadedmetadata = () => {
+                    timeline.max = video.duration;
+                };
+            }
+        });
+
+        function togglePlayPause() {
+            if (video.paused) {
+                video.play();
+                playPauseButton.textContent = "Pause";
+            } else {
+                video.pause();
+                playPauseButton.textContent = "Play";
+            }
+        }
+
+        function setReleaseTime() {
+            video.pause();
+            playPauseButton.textContent = "Play";
+            releaseTime = video.currentTime;
+            releaseMarker.style.left = `${(releaseTime / video.duration) * 100}%`;
+            releaseMarker.style.display = 'block';
+            alert(`Release time set at ${releaseTime.toFixed(2)} seconds`);
+        }
+
+        function setImpactTime() {
+            video.pause();
+            playPauseButton.textContent = "Play";
+            impactTime = video.currentTime;
+            impactMarker.style.left = `${(impactTime / video.duration) * 100}%`;
+            impactMarker.style.display = 'block';
+            alert(`Impact time set at ${impactTime.toFixed(2)} seconds`);
+        }
+
+        function calculateSpeed() {
+            if (releaseTime === null || impactTime === null) {
+                alert("Please set both release and impact points.");
+                return;
+            }
+            const timeTaken = impactTime - releaseTime;
+            if (timeTaken <= 0) {
+                alert("Invalid timestamps. Make sure the impact time is after the release time.");
+                return;
+            }
+            const distance = parseFloat(document.getElementById("distance").value);
+            const speedMps = distance / timeTaken;
+            const speedKmph = speedMps * 3.6;
+            const speedMph = speedMps * 2.237;
+            document.getElementById("speedResult").innerHTML = `Speed: ${speedKmph.toFixed(2)} km/h (${speedMph.toFixed(2)} mph)`;
+        }
+
+        video.addEventListener("timeupdate", () => {
+            timeline.value = video.currentTime;
+        });
+
+        timeline.addEventListener("input", () => {
+            video.currentTime = timeline.value;
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.code === "Space") {
+                event.preventDefault();
+                togglePlayPause();
+            }
+        });
+    </script>
+</body>
+</html>
