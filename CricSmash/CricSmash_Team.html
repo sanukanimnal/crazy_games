@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CricSmash Dream Team </title>
+    <link rel="icon" type="image/x-icon" href="pic.png">
+    <style>
+html, body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(45deg, #1a1a3f, #3a3a7a, #2f3b5c);
+    color: #fff;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden; /* Prevents horizontal scrolling */
+    overflow-y: auto; /* Allows vertical scrolling if needed */
+    margin: 0;
+    padding: 0;
+}
+        @keyframes bgAnimation {
+            0% { background: linear-gradient(45deg, #1a1a3f, #3a3a7a, #2f3b5c); }
+            100% { background: linear-gradient(45deg, #2c2c5c, #4a4a9a, #3f5672); }
+        }
+
+        .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 500px;
+    padding-bottom: 20px; /* Ensures bottom part is not cut */
+}
+
+.card {
+    width: 250px;
+    height: 350px;
+    border: 3px solid #ff00ff;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 20px #ff00ff;
+    background: #000;
+    position: relative; /* Ensure child elements are positioned correctly */
+}
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .player-info-box {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 10px;
+    text-align: center;
+    border-top: 3px solid #0ff;
+    box-shadow: 0 0 10px #0ff;
+}
+        .buttons, .next-btn-container {
+            margin-top: 10px;
+        }
+
+        button {
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 250px;
+}
+
+        .in-btn { background: #0f0; color: #fff; box-shadow: 0 0 10px #0f0; }
+        .out-btn { background: #f00; color: #fff; box-shadow: 0 0 10px #f00; }
+        .next-btn { background: #00f; color: #fff; box-shadow: 0 0 10px #00f; }
+
+        .team-card { display: none; }
+        .selection-card { display: none; }
+
+        .highlight { background: gold !important; }
+        .team-card {
+    display: none;
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #fff;
+    text-align: center;
+}
+
+.team-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 300px;
+}
+.team-list li {
+    padding: 10px;
+    margin: 5px;
+    background: #222;
+    cursor: grab;
+    border: 2px solid #fff;
+    text-align: center;
+    font-size: 18px;
+    border-radius: 10px;
+}
+
+
+.team-list .drag-over {
+    background: #444;
+    box-shadow: 0 0 10px cyan;
+    transform: scale(1.05);
+}
+@media (max-width: 600px) {
+    .container {
+        width: 95%;
+    }
+
+    .card {
+        width: 200px;
+        height: 300px;
+    }
+
+    .team-card {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .team-list li {
+        font-size: 16px;
+        padding: 8px;
+    }
+
+    button {
+        font-size: 16px;
+        padding: 10px;
+    }
+}
+.player-info-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+#view-players-label {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 5px 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    display: block; /* Ensures visibility */
+}
+
+    </style>
+</head>
+<body>
+    <center><h1> <bold>CricSmash Dream Team</bold></h1></center>
+
+    <div class="container" id="player-selection">
+        <div class="card" id="player-card">
+            <img id="player-img" src="" alt="Cricketer">
+            <div class="player-info-overlay">
+                <div id="player-name"></div>
+                <div id="player-country"></div>
+            </div>
+        </div>
+        <div class="buttons">
+            <button class="in-btn" onclick="addToTeam()">Add to Team</button>
+            <button class="out-btn" onclick="nextPlayer()">Skip</button>
+        </div>
+    </div>
+
+    <div class="next-btn-container" id="next-btn-container" style="display:none;">
+        <button class="next-btn" onclick="selectRoles()">Next</button>
+    </div>
+
+    <div class="team-card" id="team-card">
+        <ul id="team-list" class="team-list"></ul>
+    </div>
+<script src="player.js"></script>
+    <script>
+        let index = 0;
+        let team = [];
+        const maxPlayers = 11;
+
+        function loadNextPlayer() {
+    if (index < players.length) {
+        let player = players[index];
+        document.getElementById("player-img").src = `images/${player.name.replace(/\s+/g, '_').toLowerCase()}/1.jpg`;
+        document.getElementById("player-name").textContent = player.name;
+        document.getElementById("player-country").textContent = player.country;
+    } else {
+        document.getElementById("player-selection").style.display = "none";
+        document.getElementById("next-btn-container").style.display = "block";
+        document.getElementById("view-players-label").style.display = "none"; // Hide when selection is done
+    }
+}
+
+
+
+        function addToTeam() {
+    if (team.length < maxPlayers) {
+        team.push(players[index]);
+        updateTeamList();
+        nextPlayer();
+    }
+    if (team.length === maxPlayers) {
+        document.getElementById("player-selection").style.display = "none";
+        document.getElementById("team-card").style.display = "block";
+        document.querySelector("h1").style.display = "none"; // Hides the heading
+    }
+}
+
+
+        function nextPlayer() {
+            index++;
+            if (index < players.length) {
+                loadNextPlayer();
+            } else {
+                document.getElementById("player-selection").style.display = "none";
+                document.getElementById("next-btn-container").style.display = "block";
+            }
+        }
+
+        function updateTeamList() {
+    let list = document.getElementById("team-list");
+    list.innerHTML = "";
+    
+    team.forEach((player, i) => {
+        let item = document.createElement("li");
+        item.textContent = player.name;
+        item.draggable = true;
+        item.dataset.index = i;
+
+        item.ondragstart = (event) => {
+            event.dataTransfer.setData("text/plain", i);
+            event.target.classList.add("dragging");
+        };
+
+        item.ondragover = (event) => {
+            event.preventDefault();
+            event.target.classList.add("drag-over");
+        };
+
+        item.ondragleave = (event) => {
+            event.target.classList.remove("drag-over");
+        };
+
+        item.ondrop = (event) => {
+            event.preventDefault();
+            let draggedIndex = event.dataTransfer.getData("text/plain");
+            let droppedIndex = event.target.dataset.index;
+            [team[draggedIndex], team[droppedIndex]] = [team[droppedIndex], team[draggedIndex]];
+            updateTeamList();
+        };
+
+        item.ondragend = () => {
+            document.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over"));
+        };
+
+        list.appendChild(item);
+    });
+}
+let captain = null;
+let wicketKeeper = null;
+
+// Shuffle players before showing them
+function shufflePlayers() {
+    for (let i = players.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [players[i], players[j]] = [players[j], players[i]];
+    }
+}
+shufflePlayers();
+
+function showNextButton() {
+    let teamCard = document.getElementById("team-card");
+    let message = document.createElement("h3");
+    message.textContent = "Drag and Drop the player on the place you want him to be.Only work on  desktop.Not support for mobile devices";
+    teamCard.prepend(message);
+
+    let nextBtn = document.createElement("button");
+    nextBtn.textContent = "Select Captain and Wicketkeeper";
+    nextBtn.classList.add("next-btn");
+    nextBtn.onclick = selectCaptain;
+    teamCard.appendChild(nextBtn);
+}
+
+function selectCaptain() {
+    document.getElementById("team-card").innerHTML = "<h2>Select the Captain</h2><ul id='team-list' class='team-list'></ul>";
+    updateSelectionList("captain");
+}
+
+function selectWicketKeeper() {
+    document.getElementById("team-card").innerHTML = "<h2>Select the Wicket Keeper</h2><ul id='team-list' class='team-list'></ul>";
+    updateSelectionList("wicketkeeper");
+}
+
+function updateSelectionList(role) {
+    let list = document.getElementById("team-list");
+    team.forEach((player) => {
+        let item = document.createElement("li");
+        item.textContent = player.name;
+        item.onclick = () => {
+            if (role === "captain") {
+                captain = player.name;
+                selectWicketKeeper();
+            } else if (role === "wicketkeeper") {
+                wicketKeeper = player.name;
+                showFinalTeam();
+            }
+        };
+        list.appendChild(item);
+    });
+}
+
+function showFinalTeam() {
+    document.getElementById("team-card").innerHTML = `
+        <h2>Your Dream Team</h2>
+        <ul id="final-team-list" class="team-list">
+            ${team.map(player => {
+                let roleTag = player.name === captain ? " (C)" : player.name === wicketKeeper ? " (WK)" : "";
+                return `<li>${player.name}${roleTag}</li>`;
+            }).join("")}
+        </ul>
+        <button onclick="shareFinalTeam()">Share Your Dream Team on WhatsApp</button>
+    `;
+}
+
+function shareFinalTeam() {
+    let message = "🏏 *My Dream Cricket Team* 🏏\n\n" +
+                  "*Here is my ultimate team selection! Let me know your thoughts!* 🔥\n\n";
+
+    let teamStr = team.map(player => {
+        let roleTag = player.name === captain ? " (C)" : player.name === wicketKeeper ? " (WK)" : "";
+        return `• ${player.name}${roleTag}`;
+    }).join("\n");
+
+    let link = "\n\n🌐 *Play CricSmash Dream Team Now:* https://sanukanimnal.github.io/crazy_games/CricSmash/CricSmash_Team.html";
+
+    let fullMessage = `${message}${teamStr}${link}`;
+
+    const whatsappLink = `whatsapp://send?text=${encodeURIComponent(fullMessage)}`;
+    window.open(whatsappLink, "_blank");
+}
+
+
+showNextButton();
+
+
+
+
+
+        loadNextPlayer();
+    </script>
+</body>
+</html>
