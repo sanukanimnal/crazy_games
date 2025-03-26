@@ -407,7 +407,34 @@ let allMusic = [
       src: "music-50",
       tags: ["pop", "dance", "romantic"]
     },
-  
+    {
+      name: "Formula 1 Theme",
+      artist: "Brian Tyler",
+      img: "music-51",
+      src: "music-51",
+      tags: ["pop", "dance", "energitic","fav"]
+    },  
+    {
+      name: "Price Tag",
+      artist: "Jessie J Feat. B.o.B",
+      img: "music-52",
+      src: "music-52",
+      tags: ["pop", "dance", "party"]
+    },  
+    {
+      name: "Shut Up and Dance",
+      artist: "WALK THE MOON",
+      img: "music-53",
+      src: "music-53",
+      tags: ["pop", "dance", "party"]
+    }, 
+    {
+      name: "Replay",
+      artist: "Iyaz",
+      img: "music-54",
+      src: "music-54",
+      tags: ["pop", "rap", "party","fav"]
+    }, 
     {
       name: "Wake Me Up",
       artist: "Avicii",
@@ -652,7 +679,7 @@ let allMusic = [
     artist: "DJ JNK & Moniyo",
     img: "music-90",
     src: "music-90",
-    tags: ["party", "energetic"]
+    tags: ["party", "energetic","sinhala"]
 },
 
 {
@@ -660,7 +687,7 @@ let allMusic = [
     artist: "Shan Putha & Maduwa",
     img: "music-97",
     src: "music-97",
-    tags: ["rap", "party", "energetic"]
+    tags: ["rap", "party", "energetic","sinhala"]
 },
 
 {
@@ -668,7 +695,7 @@ let allMusic = [
     artist: "Costa & Masterd",
     img: "music-98",
     src: "music-98",
-    tags: ["rap", "energetic"]
+    tags: ["rap", "energetic","sinhala"]
 },
 
 {
@@ -676,7 +703,7 @@ let allMusic = [
     artist: "Uzi Senadeera",
     img: "music-99",
     src: "music-99",
-    tags: ["sad", "soft"]
+    tags: ["sad", "soft","rap","sinhala"]
 },
 
 {
@@ -684,7 +711,7 @@ let allMusic = [
     artist: "Shan Putha, DJ JNK & Moniyo",
     img: "music-100",
     src: "music-100",
-    tags: ["party", "energetic", "rap"]
+    tags: ["party", "energetic", "rap","sinhala"]
 },
 
 {
@@ -692,7 +719,7 @@ let allMusic = [
     artist: "DJ JNK & Moniyo",
     img: "music-101",
     src: "music-101",
-    tags: ["pop", "happy"]
+    tags: ["pop", "happy","rap","sinhala"]
 },
 
 {
@@ -865,7 +892,7 @@ let allMusic = [
 
 {
   name: "Alone",
-  artist: "Alan Walker",
+  artist: "Marshmellow",
   img: "music-124",
   src: "music-124",
   tags: ["pop", "energetic"]
@@ -990,15 +1017,140 @@ let allMusic = [
   src: "music-139",
   tags: ["pop", "energetic"]
 },
-
+{
+  name: "Bad Blood",
+  artist: "Taylor Swift",
+  img: "music-140",
+  src: "music-140",
+  tags: ["pop", "energetic"]
+},
+{
+  name: "Summertime Sadness",
+  artist: "Lana Del Rey",
+  img: "music-141",
+  src: "music-141",
+  tags: ["pop", "soft"]
+},
+{
+  name: "Lovely",
+  artist: "Billie Eillish ft. Khalid",
+  img: "music-142",
+  src: "music-142",
+  tags: ["pop", "sad"]
+},
+{
+  name: "Derniere Danse",
+  artist: "Indila",
+  img: "music-143",
+  src: "music-143",
+  tags: ["pop", "sad"]
+},
+{
+  name: "Havana",
+  artist: "Camila Cobello",
+  img: "music-144",
+  src: "music-144",
+  tags: ["pop", "energitic","romantic"]
+},
+{
+  name: "Senorita",
+  artist: "Camila Cobello & Senorita",
+  img: "music-145",
+  src: "music-145",
+  tags: ["pop", "romantic"]
+},
+{
+  name: "Perfect",
+  artist: "Ed Sheeran",
+  img: "music-146",
+  src: "music-146",
+  tags: ["pop", "romantic","happy"]
+},
+{
+  name: "Heat Waves",
+  artist: "Glass Animals",
+  img: "music-147",
+  src: "music-147",
+  tags: ["pop", "happy"]
+},
+{
+  name: "10000 Hours",
+  artist: "Justin Beiber X Dan + Shay",
+  img: "music-148",
+  src: "music-148",
+  tags: ["pop", "happy","romantic"]
+},
+{
+  name: "Birds On a Feather",
+  artist: "Billie Eillish",
+  img: "music-149",
+  src: "music-149",
+  tags: ["pop", "soft"]
+},
 {
   name: "Before You Go",
   artist: "Lewis Capaldi",
   img: "music-151",
   src: "music-151",
   tags: ["pop", "sad"]
-}
+},
+{name: "Doppi Nakin", artist: "Funky Dirt", img:"music-152", src:"music-152", tags: ["sinhala","energetic","party","happy"] },
+{name: "Sarawita", artist: "DJ JNK X Moniyo", img:"music-153", src:"music-153", tags: ["sinhala","party","rap"] },
+{name: "Sudu Gawuma", artist: "La Signore", img:"music-154", src:"music-154", tags: ["sinhala","romantic","soft"] },
+{name: "Desin Pe", artist: "La Signore", img:"music-155", src:"music-155", tags: ["fav","sinhala","romantic","soft"] },
+{name: "Hawasaka Ma", artist: "La Signore", img:"music-156", src:"music-156", tags: ["sinhala","romantic","soft"] },
+{name: "Paren", artist: "La Signore X Sanuka X Randhir", img:"music-157", src:"music-157", tags: ["sinhala","energetic","party","happy"] },
+{name: "I'm Good", artist: "Bebe Rexha & David Guetta", img:"music-158", src:"music-158", tags: ["pop","energetic","party","electronic","happy"] },
+{name: "Waiting for Love", artist: "Avicii", img:"music-159", src:"music-159", tags: ["pop","energetic","party","electronic","happy"] },
+{name: "Save Your Tears", artist: "Weeknd", img:"music-160", src:"music-160", tags: ["pop","energetic","party","electronic","happy","sad"] },
+{name: "Stereo Love", artist: "Edward Maya & Vika Jiolina", img:"music-161", src:"music-161", tags: ["pop","romantic","happy","sad"] },
+{name: "Solo", artist: "Clean Bandit", img:"music-162", src:"music-162", tags: ["pop","energetic","party","electronic"] },
+{name: "Bad Habits", artist: "Ed Sheeran", img:"music-163", src:"music-163", tags: ["pop","happy"] },
+{name: "Royality", artist: "Egzod & Maestro Chives", img:"music-164", src:"music-164", tags: ["pop","electronic","sad"] },
+{name: "Ignite", artist: "Alan Walker ft. K-391", img:"music-165", src:"music-165", tags: ["pop","energetic","party","electronic"] },
+{name: "Animals", artist: "Martin Garrix", img:"music-166", src:"music-166", tags: ["fav","energetic","party","electronic"] },
+{name: "Scared to be Lonely", artist: "Martin Garrix X Dua Lipa", img:"music-167", src:"music-167", tags: ["pop","energetic","romantic","party","electronic","happy"] },
+{name: "Memories", artist: "Maroon 5", img:"music-168", src:"music-168", tags: ["pop","energetic","romantic","party","happy"] },
+{name: "Paradise", artist: "Coldplay", img:"music-169", src:"music-169", tags: ["pop","energetic","party","happy"] },
+{name: "Treat You Better", artist: "Shawn Mendes", img:"music-170", src:"music-170", tags: ["pop","energetic","romantic","party","happy"] },
+{name: "Circles", artist: "Post Maleon", img:"music-171", src:"music-171", tags: ["pop","energetic","party","happy","rap"] },
+{name: "Sorry", artist: "Justin Beiber", img:"music-172", src:"music-172", tags: ["pop","happy","soft"] },
+{name: "Levitating", artist: "Dua Lipa", img:"music-173", src:"music-173", tags: ["pop","energetic","romantic","happy"] },
+{name: "Believer", artist: "Imagine Dragon", img:"music-174", src:"music-174", tags: ["pop","energetic","happy"] },
+{name: "Girls Like You", artist: "Maroon 5", img:"music-175", src:"music-175", tags: ["pop","energetic","happy","soft"] },
+{name: "Middle of Night", artist: "Elley Duhé", img:"music-176", src:"music-176", tags: ["pop","energetic","party","electronic"] },
+{name: "Infinity", artist: "Jaymes Young", img:"music-177", src:"music-177", tags: ["fav","pop","party","happy","soft"] },
+{name: "Stereo Hearts", artist: "Gym Class Heroes", img:"music-178", src:"music-178", tags: ["pop","energetic","happy"] },
+{name: "Bones", artist: "Imagine Dragon", img:"music-179", src:"music-179", tags: ["pop","energetic","party","happy"] },
+{name: "Drag me Down", artist: "One Direction", img:"music-180", src:"music-180", tags: ["pop","energetic","happy","acoustic"] },
+{name: "Let me Down Slowly", artist: "Alec Benjamin", img:"music-181", src:"music-181", tags: ["pop","energetic","happy","soft"] },
+{name: "Shivers", artist: "Ed Sheeran", img:"music-182", src:"music-182", tags: ["pop"] },
+{name: "We Don't talk anymore", artist: "Charlie Puth feat. Selena Gomez", img:"music-183", src:"music-183", tags: ["pop","romantic","soft","sad"] },
+{name: "Sky High", artist: "Elektronomia", img:"music-184", src:"music-184", tags: ["fav","pop","energetic","party","electronic"] },
+{name: "Kamak Na", artist: "Shan Putha", img:"music-185", src:"music-185", tags: ["sinhala","energetic","party","rap"] },
+{name: "Unseen Hearts", artist: "Sanuka Nimnal", img:"music-208", src:"music-208", tags: ["fav","pop","romantic","happy","soft"] },
+{name: "Siththamak", artist: "Kelwiz", img:"music-186", src:"music-186", tags: ["sinhala","energetic","party","rap"] },
+{name: "Periyamulla", artist: "Big Doggy X Shan Putha X Costa", img:"music-187", src:"music-187", tags: ["sinhala","energetic","party","rap"] },
+{name: "Gammane", artist: "Costa X Duava", img:"music-188", src:"music-188", tags: ["sinhala","energetic","party","rap"] },
+{name: "Batanala", artist: "Costa", img:"music-189", src:"music-189", tags: ["sinhala","energetic","party","rap"] },
+{name: "Taki Taki", artist: "DJ Snake X Selena Gomez feat. Cardi B", img:"music-190", src:"music-190", tags: ["pop","energetic","party","rap"] },
+{name: "Danza Kuduro", artist: "Don Omra", img:"music-191", src:"music-191", tags: ["pop","energetic","party","fr"] },
+{name: "Bailando", artist: "Reggaeton Latino", img:"music-192", src:"music-192", tags: ["pop","energetic","party","fr"] },
+{name: "Despacito", artist: "Luis Fonsi FT. Daddy Yankee", img:"music-193", src:"music-193", tags: ["pop","energetic","party","happy","fr"] },
+{name: "No Lie", artist: "Dua Lipa Feat. Sean Paul", img:"music-194", src:"music-194", tags: ["pop","energetic","party","happy"] },
+{name: "I Don't Care", artist: "Ed Sheeran & Justin Beiber", img:"music-195", src:"music-195", tags: ["pop","happy","soft"] },
+{name: "Gasolina", artist: "Daddy Yankee", img:"music-196", src:"music-196", tags: ["pop","energetic","party","happy","fr"] },
+{name: "Deja Vu", artist: "Olivia Rodrigo", img:"music-197", src:"music-197", tags: ["pop","energetic","happy","soft"] },
+{name: "DJ Remix 1", artist: "EDM", img:"music-198", src:"music-198", tags: ["electronic"] },
+{name: "Mockingbird", artist: "Eminem", img:"music-199", src:"music-199", tags: ["pop","energetic","party","rap"] },
+{name: "Lose Yourself", artist: "Eminem", img:"music-200", src:"music-200", tags: ["pop","energetic","party","rap"] },
+{name: "Without Me", artist: "Eminem", img:"music-201", src:"music-201", tags: ["pop","energetic","party","rap"] },
+{name: "Rap God", artist: "Eminem", img:"music-202", src:"music-202", tags: ["pop","energetic","party","rap"] },
+{name: "Gangsta's Paradise ", artist: "Coolio", img:"music-203", src:"music-203", tags: ["pop","energetic","party","rap"] },
+{name: "StarBoy", artist: "Weeknd", img:"music-204", src:"music-204", tags: ["pop","energetic","party","sad"] },
+{name: "Not Like Us", artist: "Kendrik Lamar", img:"music-205", src:"music-205", tags: ["pop","energetic","party","rap"] },
+{name: "FE!N", artist: "Travis Scott", img:"music-206", src:"music-206", tags: ["pop","energetic","party","rap"] },
+{name: "Happier", artist: "Olivia Rodrigo", img:"music-207", src:"music-207", tags: ["pop","energetic","party"] },
 
-   
-  
+
 ];
