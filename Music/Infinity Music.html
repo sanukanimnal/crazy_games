@@ -785,7 +785,7 @@ function loadSong(index) {
     document.getElementById("playerImg").src = `images/${song.img}.png`;
     document.getElementById("playerSong").innerText = song.name;
     document.getElementById("playerArtist").innerText = song.artist;
-    audioPlayer.src = `songs/${song.src}.mp3`;
+    audioPlayer.src = `Songs/${song.src}.mp3`;
     audioPlayer.onloadedmetadata = () => {
         totalDurationDisplay.innerText = formatTime(audioPlayer.duration);
         timeline.max = Math.floor(audioPlayer.duration);
@@ -1017,7 +1017,7 @@ function loadSongFromPlaylist(index) {
     document.getElementById("playerImg").src = `images/${song.img}.png`;
     document.getElementById("playerSong").innerText = song.name;
     document.getElementById("playerArtist").innerText = song.artist;
-    audioPlayer.src = `songs/${song.src}.mp3`;
+    audioPlayer.src = `Songs/${song.src}.mp3`;
 }
 function updateGreeting() {
     let now = new Date();
@@ -1142,7 +1142,7 @@ function createMusicRow(title, songsList, container) {
         // Add click functionality to play the song
         songCard.addEventListener('click', function() {
             const audioPlayer = document.getElementById("audio-player");
-            audioPlayer.src = `audio/${song.src}.mp3`; // Ensure audio source path is correct
+            audioPlayer.src = `Songs/${song.src}.mp3`; // Ensure audio source path is correct
             audioPlayer.play();
         });
         
