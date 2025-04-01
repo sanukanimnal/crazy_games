@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="infinity.png">
+
+    <title>Text Encrypter & Decrypter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            overflow: hidden;
+            height: 100%;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #000000, #1a1a2e);
+            background-size: cover;
+            color: #0ff;
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin-top: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+        textarea {
+            width: 80%;
+            height: 100px;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            background: black;
+            color: white;
+            resize: none;
+        }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .button-container button {
+            width: 45%;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .encrypt-btn { background: #2ecc71; color: black; }
+        .decrypt-btn { background: #e74c3c; color: black; }
+        .paste-btn { background: #8e44ad; color: black; }
+        .whatsapp-btn { background: #25D366; color: black; }
+        button:hover { opacity: 0.8; }
+        footer {
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #0ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Text Encrypter & Decrypter 🔑</h1>
+    <div class="container">
+        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+        <div class="button-container">
+            <button class="encrypt-btn" onclick="encryptText()">Encrypt 🔏</button>
+            <button class="decrypt-btn" onclick="decryptText()">Decrypt 🔓</button>
+            <button class="paste-btn" onclick="pasteText()">Paste 📄</button>
+            <button class="whatsapp-btn" onclick="sendWhatsApp()">Send via WhatsApp 📲</button>
+        </div>
+        <textarea id="outputText" readonly placeholder="Result will appear here..."></textarea>
+    </div>
+<footer>    <marquee> Created by Sanuka Nimnal.Powered by Infinity Software Solution 2025 <sup>&copy</sup></marquee></footer>
+    <script>
+        function encryptText() {
+            let text = document.getElementById("inputText").value;
+            let encrypted = text.split('').map(char => String.fromCharCode(char.charCodeAt(0) + 5)).join('');
+            document.getElementById("outputText").value = encrypted;
+            copyToClipboard(encrypted);
+        }
+
+        function decryptText() {
+            let text = document.getElementById("outputText").value;
+            try {
+                let decrypted = text.split('').map(char => String.fromCharCode(char.charCodeAt(0) - 5)).join('');
+                document.getElementById("outputText").value = decrypted;
+                copyToClipboard(decrypted);
+            } catch (e) {
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+            });
+        }
+
+        function pasteText() {
+            navigator.clipboard.readText().then(text => {
+                document.getElementById("inputText").value = text;
+            });
+        }
+
+        function sendWhatsApp() {
+            let message = document.getElementById("outputText").value;
+            const whatsappLink = `whatsapp://send?text=${encodeURIComponent(message)}`;
+            window.open(whatsappLink, '_blank');
+        }
+    </script>
+</body>
+</html>
