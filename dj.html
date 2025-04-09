@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎛️ DJ Deck A</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #111;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .deck {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #1a1a1a;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 0 20px #00ffff44;
+    }
+
+    .deck h2 {
+      color: #00ffff;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    label {
+      display: block;
+      margin: 0.5rem 0;
+      font-weight: bold;
+    }
+
+    button {
+      background-color: #00ffff;
+      border: none;
+      padding: 0.5rem 1.2rem;
+      font-size: 1rem;
+      margin: 0.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      color: #000;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #00cccc;
+    }
+
+    canvas {
+      margin-top: 1rem;
+      width: 100%;
+      height: 120px;
+      border-radius: 1rem;
+      background: #000;
+    }
+
+    .turntable {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin: 1rem auto;
+      background: radial-gradient(circle, #333 40%, #00ffff 41%, #0ff 60%);
+      animation: spin 4s linear infinite;
+      border: 4px solid #0ff;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .track-info {
+      margin: 1rem 0;
+      color: #ccc;
+    }
+
+    .progress {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .time {
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      .deck {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck">
+    <h2>Deck A 🎶</h2>
+    <input type="file" id="fileInput" accept="audio/*">
+    
+    <div class="track-info" id="trackInfo">No track loaded</div>
+    
+    <div class="turntable" id="turntable"></div>
+    
+    <button id="playPause">Play</button>
+    
+    <div class="progress">
+      <span class="time" id="currentTime">00:00</span>
+      <input type="range" id="progress" value="0" min="0" max="100" step="0.1">
+      <span class="time" id="duration">00:00</span>
+    </div>
+
+    <label>Volume
+      <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+    </label>
+    <label>Bass
+      <input type="range" id="bass" min="-30" max="30" value="0">
+    </label>
+    <label>Mid
+      <input type="range" id="mid" min="-30" max="30" value="0">
+    </label>
+    <label>Treble
+      <input type="range" id="treble" min="-30" max="30" value="0">
+    </label>
+    <div class="deck">
+      <h2>🛠️ DJ Tools</h2>
+    
+      <h3>🎚️ FX Controls</h3>
+      <button id="toggleReverb">Toggle Reverb</button>
+      <button id="toggleDelay">Toggle Delay</button>
+      <button id="toggleFilter">Toggle Filter</button>
+    
+      <label>Filter Frequency
+        <input type="range" id="filterFreq" min="200" max="10000" value="10000">
+      </label>
+    
+      <h3>🎵 Sample Pads</h3>
+      <div>
+        <button onclick="playSample('airhorn')">🔊 Airhorn</button>
+        <button onclick="playSample('scratch')">💿 Scratch</button>
+        <button onclick="playSample('drum')">🥁 Drum</button>
+        <button onclick="playSample('vocal')">🎤 Vocal</button>
+      </div>
+    </div>
+    
+    <canvas id="visualizer"></canvas>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const playPauseBtn = document.getElementById('playPause');
+    const volumeControl = document.getElementById('volume');
+    const bassControl = document.getElementById('bass');
+    const midControl = document.getElementById('mid');
+    const trebleControl = document.getElementById('treble');
+    const canvas = document.getElementById('visualizer');
+    const ctx = canvas.getContext('2d');
+    const trackInfo = document.getElementById('trackInfo');
+    const currentTimeText = document.getElementById('currentTime');
+    const durationText = document.getElementById('duration');
+    const progressBar = document.getElementById('progress');
+    const turntable = document.getElementById('turntable');
+
+    let audio, audioContext, source, analyser, gainNode;
+    let bassEQ, midEQ, trebleEQ;
+    let isPlaying = false;
+    let animationId;
+    let reverbGain, delayGain;
+    let reverbOn = false, delayOn = false, filterOn = false;
+let sampleBuffers = {};
+const filterFreq = document.getElementById("filterFreq");
+
+async function loadSample(name, url) {
+  const response = await fetch(url);
+  const arrayBuffer = await response.arrayBuffer();
+  sampleBuffers[name] = await audioContext.decodeAudioData(arrayBuffer);
+}
+
+function playSample(name) {
+  if (!sampleBuffers[name]) return;
+  const sampleSource = audioContext.createBufferSource();
+  sampleSource.buffer = sampleBuffers[name];
+  sampleSource.connect(audioContext.destination);
+  sampleSource.start();
+}
+
+
+function setupFX() {
+  reverb = audioContext.createConvolver();
+  delay = audioContext.createDelay();
+  filter = audioContext.createBiquadFilter();
+
+  reverbGain = audioContext.createGain();
+  delayGain = audioContext.createGain();
+
+  reverbGain.gain.value = 0;
+  delayGain.gain.value = 0;
+
+  filter.type = "lowpass";
+  filter.frequency.value = 10000;
+
+  // Fetch reverb impulse
+  fetch('https://cdn.jsdelivr.net/gh/mdn/webaudio-examples/audio-buffer/reverb.wav')
+    .then(res => res.arrayBuffer())
+    .then(buffer => audioContext.decodeAudioData(buffer))
+    .then(decoded => reverb.buffer = decoded);
+
+  // Connect FX chain statically once
+  source
+    .connect(bassEQ)
+    .connect(midEQ)
+    .connect(trebleEQ);
+
+  trebleEQ.connect(reverb).connect(reverbGain).connect(gainNode);
+  trebleEQ.connect(delay).connect(delayGain).connect(gainNode);
+  trebleEQ.connect(filter).connect(gainNode);
+
+  gainNode.connect(analyser).connect(audioContext.destination);
+}
+
+
+
+document.getElementById("toggleReverb").onclick = () => {
+  reverbOn = !reverbOn;
+  updateFXStates();
+};
+
+document.getElementById("toggleDelay").onclick = () => {
+  delayOn = !delayOn;
+  updateFXStates();
+};
+
+document.getElementById("toggleFilter").onclick = () => {
+  filterOn = !filterOn;
+  updateFXStates();
+};
+
+document.getElementById("filterFreq").oninput = () => {
+  if (filterOn) filter.frequency.value = filterFreq.value;
+};
+
+
+function updateFXStates() {
+  reverbGain.gain.value = reverbOn ? 1 : 0;
+  delayGain.gain.value = delayOn ? 1 : 0;
+  filterGain.gain.value = filterOn ? 1 : 0; // Toggle filter completely
+  if (filterOn) {
+    filter.frequency.value = filterFreq.value;
+  } else {
+    filter.frequency.value = 10000; // Neutral
+  }
+}
+
+// Load sample audio
+fileInput.addEventListener('change', async () => {
+  setupFX();
+  await loadSample('airhorn', 'https://freesound.org/data/previews/70/70013_634166-lq.mp3');
+  await loadSample('scratch', 'https://freesound.org/data/previews/476/476178_5121236-lq.mp3');
+  await loadSample('drum', 'https://freesound.org/data/previews/20/2086_5157-lq.mp3');
+  await loadSample('vocal', 'https://freesound.org/data/previews/185/185683_2394245-lq.mp3');
+});
+
+    function formatTime(sec) {
+      const minutes = Math.floor(sec / 60);
+      const seconds = Math.floor(sec % 60).toString().padStart(2, '0');
+      return `${minutes}:${seconds}`;
+    }
+
+    function setupAudioNodes() {
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  source = audioContext.createMediaElementSource(audio);
+
+  // EQ nodes
+  gainNode = audioContext.createGain();
+  analyser = audioContext.createAnalyser();
+
+  bassEQ = audioContext.createBiquadFilter();
+  bassEQ.type = "lowshelf";
+  bassEQ.frequency.value = 500;
+
+  midEQ = audioContext.createBiquadFilter();
+  midEQ.type = "peaking";
+  midEQ.frequency.value = 1500;
+
+  trebleEQ = audioContext.createBiquadFilter();
+  trebleEQ.type = "highshelf";
+  trebleEQ.frequency.value = 3000;
+
+  // FX nodes
+  reverb = audioContext.createConvolver();
+  delay = audioContext.createDelay();
+  filter = audioContext.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.value = 10000;
+
+  // FX Gain Controllers
+  reverbGain = audioContext.createGain();
+  delayGain = audioContext.createGain();
+  filterGain = audioContext.createGain();
+
+  // Start FX as bypassed
+  reverbGain.gain.value = 0;
+  delayGain.gain.value = 0;
+  filterGain.gain.value = 1;
+
+  // Load reverb impulse
+  fetch('https://cdn.jsdelivr.net/gh/mdn/webaudio-examples/audio-buffer/reverb.wav')
+    .then(res => res.arrayBuffer())
+    .then(buffer => audioContext.decodeAudioData(buffer))
+    .then(decoded => reverb.buffer = decoded);
+
+  // Chain connections
+  source.connect(bassEQ);
+  bassEQ.connect(midEQ);
+  midEQ.connect(trebleEQ);
+
+  trebleEQ.connect(reverb);
+  trebleEQ.connect(delay);
+  trebleEQ.connect(filter);
+
+  reverb.connect(reverbGain);
+  delay.connect(delayGain);
+  filter.connect(filterGain);
+
+  // Merge all FX back into one signal
+  reverbGain.connect(gainNode);
+  delayGain.connect(gainNode);
+  filterGain.connect(gainNode);
+
+  gainNode.connect(analyser);
+  analyser.connect(audioContext.destination);
+}
+
+    function drawVisualizer() {
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      function draw() {
+        animationId = requestAnimationFrame(draw);
+        analyser.getByteFrequencyData(dataArray);
+
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const barWidth = (canvas.width / bufferLength) * 2.5;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+          const barHeight = dataArray[i];
+          ctx.fillStyle = `rgb(${barHeight + 100}, 255, 255)`;
+          ctx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
+          x += barWidth + 1;
+        }
+      }
+
+      draw();
+    }
+
+    fileInput.addEventListener('change', function () {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      if (audio) {
+        audio.pause();
+        cancelAnimationFrame(animationId);
+      }
+
+      audio = new Audio(URL.createObjectURL(file));
+      audio.crossOrigin = "anonymous";
+      audio.addEventListener('loadedmetadata', () => {
+        durationText.textContent = formatTime(audio.duration);
+        progressBar.max = audio.duration;
+        trackInfo.textContent = file.name;
+      });
+
+      audio.addEventListener('timeupdate', () => {
+        progressBar.value = audio.currentTime;
+        currentTimeText.textContent = formatTime(audio.currentTime);
+      });
+
+      progressBar.addEventListener('input', () => {
+        audio.currentTime = progressBar.value;
+      });
+
+      setupAudioNodes();
+      drawVisualizer();
+    });
+
+    playPauseBtn.addEventListener('click', () => {
+      if (!audio) return;
+
+      if (!isPlaying) {
+        audio.play();
+        playPauseBtn.textContent = "Pause";
+        turntable.style.animationPlayState = "running";
+        isPlaying = true;
+      } else {
+        audio.pause();
+        playPauseBtn.textContent = "Play";
+        turntable.style.animationPlayState = "paused";
+        isPlaying = false;
+      }
+    });
+
+    volumeControl.addEventListener('input', () => {
+      if (gainNode) gainNode.gain.value = volumeControl.value;
+    });
+
+    bassControl.addEventListener('input', () => {
+      if (bassEQ) bassEQ.gain.value = bassControl.value;
+    });
+
+    midControl.addEventListener('input', () => {
+      if (midEQ) midEQ.gain.value = midControl.value;
+    });
+
+    trebleControl.addEventListener('input', () => {
+      if (trebleEQ) trebleEQ.gain.value = trebleControl.value;
+    });
+  </script>
+
+</body>
+</html>
