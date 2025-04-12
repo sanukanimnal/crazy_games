@@ -15,15 +15,17 @@
       margin: 0;
       padding: 2rem;
       text-align: center;
+      overflow: hidden;
     }
 
     .deck {
       max-width: 700px;
       margin: 0 auto;
-      background: #1a1a1a;
+      background: #37013a;
       border-radius: 1rem;
       padding: 2rem;
       box-shadow: 0 0 20px #00ffff44;
+      overflow: hidden;
     }
 
     .deck h2 {
@@ -41,14 +43,14 @@
     }
 
     button {
-      background-color: #00ffff;
+      background-color: #ff3b94;
       border: none;
       padding: 0.5rem 1.2rem;
       font-size: 1rem;
       margin: 0.5rem;
       border-radius: 0.5rem;
       cursor: pointer;
-      color: #000;
+      color: white;
       transition: background 0.2s ease;
     }
 
@@ -56,13 +58,7 @@
       background-color: #00cccc;
     }
 
-    canvas {
-      margin-top: 1rem;
-      width: 100%;
-      height: 120px;
-      border-radius: 1rem;
-      background: #000;
-    }
+
 
     .turntable {
       width: 150px;
@@ -100,26 +96,151 @@
         padding: 1rem;
       }
     }
+    #progress {
+  background: linear-gradient(to right, #88ffa5, #00ba92);
+  height: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  appearance: none;
+}
+
+#progress::-webkit-slider-thumb {
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  background: #af3dff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 5px #0ff;
+}
+.dj-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.dj-shadow {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #222 40%, #0ff 70%);
+  box-shadow: 0 0 25px #0ff;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+canvas {
+  margin-top: 1rem;
+  width: 100%;
+  height: 120px;
+  border-radius: 1rem;
+  background: #000;
+}
+
+
+.visualizer-bar {
+  background: linear-gradient(to top, #00f2ff, #0088cc);
+}
+#crossfade{
+  background: #af3dff;
+}
+.file-btn {
+  display: inline-block;
+  background-color: #00ffff;
+  color: #000;
+  padding: 0.6rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 0 15px #00ffff88;
+}
+
+.file-btn:hover {
+  background-color: #00cccc;
+  box-shadow: 0 0 25px #00ffff;
+  transform: scale(1.05);
+}
+.dj-title {
+  font-size: 3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff;
+  animation: pulseGlow 2s infinite ease-in-out, colorShift 6s infinite linear;
+  margin-bottom: 2rem;
+  letter-spacing: 0.1em;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 40px #0ff;
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 0 0 20px #0ff, 0 0 40px #0ff, 0 0 80px #0ff;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes colorShift {
+  0% { color: #0ff; }
+  25% { color: #ff0; }
+  50% { color: #f0f; }
+  75% { color: #0f0; }
+  100% { color: #0ff; }
+}
+
   </style>
 </head>
 <body>
 
+  
+  <div style="position: fixed; top: 40%; width: 100%; display: flex; justify-content: space-between; pointer-events: none; z-index: -1;">
+    <!-- Left Beat Circle -->
+    <div id="leftBeatCircle" style="width: 150px; height: 150px; border-radius: 50%; background: #0ff; opacity: 0.4; box-shadow: 0 0 60px #0ff88a; transition: all 0.1s ease;"></div>
+  
+    <!-- Right Beat Circle -->
+    <div id="rightBeatCircle" style="width: 150px; height: 150px; border-radius: 50%; background: #f0f; opacity: 0.4; box-shadow: 0 0 60px #f0f88a; transition: all 0.1s ease;"></div>
+  </div>
+  
+  
+
   <div class="deck">
-    <h2>Deck A 🎶</h2>
-    <input type="file" id="fileInput" accept="audio/*">
+
     
-    <div class="track-info" id="trackInfo">No track loaded</div>
+    <h1 class="dj-title">🎧 DJ Deck 🎶</h1>
+ 
     
-    <div class="turntable" id="turntable"></div>
+    <canvas id="visualizer"></canvas>
     
     <button id="playPause">Play</button>
+    <button id="loopToggle">Loop: Off</button>
+<button id="cueBtn">Set Cue</button>
+<button id="muteBtn">Mute</button>
+<button id="resetEqBtn">Reset EQ</button>
+
+<span style="display: inline-block; margin-left: 1rem;">Speed: <span id="speedDisplay">1.00x</span></span>
+
     
     <div class="progress">
       <span class="time" id="currentTime">00:00</span>
       <input type="range" id="progress" value="0" min="0" max="100" step="0.1">
       <span class="time" id="duration">00:00</span>
     </div>
+    <label>Crossfade
+      <input type="range" id="crossfade" min="0" max="1" step="0.01" value="0.5">
+    </label>
+    <label>Pitch (Semitones)
+      <input type="range" id="pitch" min="-12" max="12" value="0">
+    </label>
 
+    
     <label>Volume
       <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
     </label>
@@ -132,29 +253,15 @@
     <label>Treble
       <input type="range" id="treble" min="-30" max="30" value="0">
     </label>
-    <div class="deck">
-      <h2>🛠️ DJ Tools</h2>
+    <label>Speed
+      <input type="range" id="speed" min="0.5" max="2" step="0.01" value="1">
+    </label>
     
-      <h3>🎚️ FX Controls</h3>
-      <button id="toggleReverb">Toggle Reverb</button>
-      <button id="toggleDelay">Toggle Delay</button>
-      <button id="toggleFilter">Toggle Filter</button>
+    <label for="fileInput" class="file-btn">🎵 Choose Track</label>
+    <input type="file" id="fileInput" accept="audio/*" style="display: none;">
     
-      <label>Filter Frequency
-        <input type="range" id="filterFreq" min="200" max="10000" value="10000">
-      </label>
-    
-      <h3>🎵 Sample Pads</h3>
-      <div>
-        <button onclick="playSample('airhorn')">🔊 Airhorn</button>
-        <button onclick="playSample('scratch')">💿 Scratch</button>
-        <button onclick="playSample('drum')">🥁 Drum</button>
-        <button onclick="playSample('vocal')">🎤 Vocal</button>
-      </div>
-    </div>
-    
-    <canvas id="visualizer"></canvas>
   </div>
+
 
   <script>
     const fileInput = document.getElementById('fileInput');
@@ -175,196 +282,203 @@
     let bassEQ, midEQ, trebleEQ;
     let isPlaying = false;
     let animationId;
-    let reverbGain, delayGain;
-    let reverbOn = false, delayOn = false, filterOn = false;
-let sampleBuffers = {};
-const filterFreq = document.getElementById("filterFreq");
+    const crossfade = document.getElementById('crossfade');
+const pitchControl = document.getElementById('pitch');
+const muteBtn = document.getElementById('muteBtn');
+const resetEqBtn = document.getElementById('resetEqBtn');
 
-async function loadSample(name, url) {
-  const response = await fetch(url);
-  const arrayBuffer = await response.arrayBuffer();
-  sampleBuffers[name] = await audioContext.decodeAudioData(arrayBuffer);
-}
+let originalPlaybackRate = 1;
+let isMuted = false;
 
-function playSample(name) {
-  if (!sampleBuffers[name]) return;
-  const sampleSource = audioContext.createBufferSource();
-  sampleSource.buffer = sampleBuffers[name];
-  sampleSource.connect(audioContext.destination);
-  sampleSource.start();
-}
-
-
-function setupFX() {
-  reverb = audioContext.createConvolver();
-  delay = audioContext.createDelay();
-  filter = audioContext.createBiquadFilter();
-
-  reverbGain = audioContext.createGain();
-  delayGain = audioContext.createGain();
-
-  reverbGain.gain.value = 0;
-  delayGain.gain.value = 0;
-
-  filter.type = "lowpass";
-  filter.frequency.value = 10000;
-
-  // Fetch reverb impulse
-  fetch('https://cdn.jsdelivr.net/gh/mdn/webaudio-examples/audio-buffer/reverb.wav')
-    .then(res => res.arrayBuffer())
-    .then(buffer => audioContext.decodeAudioData(buffer))
-    .then(decoded => reverb.buffer = decoded);
-
-  // Connect FX chain statically once
-  source
-    .connect(bassEQ)
-    .connect(midEQ)
-    .connect(trebleEQ);
-
-  trebleEQ.connect(reverb).connect(reverbGain).connect(gainNode);
-  trebleEQ.connect(delay).connect(delayGain).connect(gainNode);
-  trebleEQ.connect(filter).connect(gainNode);
-
-  gainNode.connect(analyser).connect(audioContext.destination);
-}
-
-
-
-document.getElementById("toggleReverb").onclick = () => {
-  reverbOn = !reverbOn;
-  updateFXStates();
-};
-
-document.getElementById("toggleDelay").onclick = () => {
-  delayOn = !delayOn;
-  updateFXStates();
-};
-
-document.getElementById("toggleFilter").onclick = () => {
-  filterOn = !filterOn;
-  updateFXStates();
-};
-
-document.getElementById("filterFreq").oninput = () => {
-  if (filterOn) filter.frequency.value = filterFreq.value;
-};
-
-
-function updateFXStates() {
-  reverbGain.gain.value = reverbOn ? 1 : 0;
-  delayGain.gain.value = delayOn ? 1 : 0;
-  filterGain.gain.value = filterOn ? 1 : 0; // Toggle filter completely
-  if (filterOn) {
-    filter.frequency.value = filterFreq.value;
-  } else {
-    filter.frequency.value = 10000; // Neutral
-  }
-}
-
-// Load sample audio
-fileInput.addEventListener('change', async () => {
-  setupFX();
-  await loadSample('airhorn', 'https://freesound.org/data/previews/70/70013_634166-lq.mp3');
-  await loadSample('scratch', 'https://freesound.org/data/previews/476/476178_5121236-lq.mp3');
-  await loadSample('drum', 'https://freesound.org/data/previews/20/2086_5157-lq.mp3');
-  await loadSample('vocal', 'https://freesound.org/data/previews/185/185683_2394245-lq.mp3');
+crossfade.addEventListener('input', () => {
+  if (!gainNode) return;
+  // For now, simulate volume shift using gain node
+  const value = parseFloat(crossfade.value);
+  gainNode.gain.value = value; // Simulating left ↔ right
 });
+
+pitchControl.addEventListener('input', () => {
+  if (!audio) return;
+  const semitones = parseInt(pitchControl.value);
+  const pitchRatio = Math.pow(2, semitones / 12);
+  audio.playbackRate = pitchRatio;
+  document.getElementById('speedDisplay').textContent = `${pitchRatio.toFixed(2)}x`;
+});
+
+muteBtn.addEventListener('click', () => {
+  if (!audio || !gainNode) return;
+  isMuted = !isMuted;
+  gainNode.gain.value = isMuted ? 0 : volumeControl.value;
+  muteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
+});
+
+resetEqBtn.addEventListener('click', () => {
+  bassControl.value = midControl.value = trebleControl.value = 0;
+  bassControl.dispatchEvent(new Event('input'));
+  midControl.dispatchEvent(new Event('input'));
+  trebleControl.dispatchEvent(new Event('input'));
+});
+
 
     function formatTime(sec) {
       const minutes = Math.floor(sec / 60);
       const seconds = Math.floor(sec % 60).toString().padStart(2, '0');
       return `${minutes}:${seconds}`;
     }
+    const speedControl = document.getElementById('speed');
+
+// Speed control
+speedControl.addEventListener('input', () => {
+  if (audio) audio.playbackRate = speedControl.value;
+});
+
+document.addEventListener('keydown', (e) => {
+  if (!audio) return;
+
+  const adjustEQ = (control, change) => {
+    const slider = document.getElementById(control);
+    let value = parseFloat(slider.value) + change;
+    value = Math.max(-30, Math.min(30, value));
+    slider.value = value;
+    slider.dispatchEvent(new Event('input'));
+  };
+
+  switch (e.key) {
+    // Bass EQ
+    case '7': adjustEQ('bass', -2); break;
+    case '8': document.getElementById('bass').value = 0;
+              document.getElementById('bass').dispatchEvent(new Event('input')); break;
+    case '9': adjustEQ('bass', +2); break;
+
+    // Mid EQ
+    case '4': adjustEQ('mid', -2); break;
+    case '5': document.getElementById('mid').value = 0;
+              document.getElementById('mid').dispatchEvent(new Event('input')); break;
+    case '6': adjustEQ('mid', +2); break;
+
+    // Treble EQ
+    case '1': adjustEQ('treble', -2); break;
+    case '2': document.getElementById('treble').value = 0;
+              document.getElementById('treble').dispatchEvent(new Event('input')); break;
+    case '3': adjustEQ('treble', +2); break;
+
+    // General controls (optional)
+    case ' ': e.preventDefault(); playPauseBtn.click(); break;
+    case 'ArrowRight': audio.currentTime = Math.min(audio.currentTime + 5, audio.duration); break;
+    case 'ArrowLeft': audio.currentTime = Math.max(audio.currentTime - 5, 0); break;
+    case 'ArrowUp':
+      volumeControl.value = Math.min(parseFloat(volumeControl.value) + 0.1, 1).toFixed(2);
+      volumeControl.dispatchEvent(new Event('input')); break;
+    case 'ArrowDown':
+      volumeControl.value = Math.max(parseFloat(volumeControl.value) - 0.1, 0).toFixed(2);
+      volumeControl.dispatchEvent(new Event('input')); break;
+    case '+':
+    case '=':
+      speedControl.value = Math.min(parseFloat(speedControl.value) + 0.1, 2).toFixed(2);
+      speedControl.dispatchEvent(new Event('input')); break;
+    case '-':
+      speedControl.value = Math.max(parseFloat(speedControl.value) - 0.1, 0.5).toFixed(2);
+      speedControl.dispatchEvent(new Event('input')); break;
+  }
+});
+let cuePoint = 0;
+
+document.getElementById('loopToggle').addEventListener('click', () => {
+  if (!audio) return;
+  audio.loop = !audio.loop;
+  document.getElementById('loopToggle').textContent = `Loop: ${audio.loop ? 'On' : 'Off'}`;
+});
+
+document.getElementById('cueBtn').addEventListener('click', () => {
+  if (!audio) return;
+  if (cuePoint === 0) {
+    cuePoint = audio.currentTime;
+    document.getElementById('cueBtn').textContent = 'Go to Cue';
+  } else {
+    audio.currentTime = cuePoint;
+  }
+});
+
+speedControl.addEventListener('input', () => {
+  if (audio) audio.playbackRate = speedControl.value;
+  document.getElementById('speedDisplay').textContent = `${parseFloat(speedControl.value).toFixed(2)}x`;
+});
+
+
 
     function setupAudioNodes() {
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  source = audioContext.createMediaElementSource(audio);
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-  // EQ nodes
-  gainNode = audioContext.createGain();
-  analyser = audioContext.createAnalyser();
+      source = audioContext.createMediaElementSource(audio);
+      gainNode = audioContext.createGain();
+      analyser = audioContext.createAnalyser();
 
-  bassEQ = audioContext.createBiquadFilter();
-  bassEQ.type = "lowshelf";
-  bassEQ.frequency.value = 500;
+      bassEQ = audioContext.createBiquadFilter();
+      bassEQ.type = "lowshelf";
+      bassEQ.frequency.value = 500;
 
-  midEQ = audioContext.createBiquadFilter();
-  midEQ.type = "peaking";
-  midEQ.frequency.value = 1500;
+      midEQ = audioContext.createBiquadFilter();
+      midEQ.type = "peaking";
+      midEQ.frequency.value = 1500;
 
-  trebleEQ = audioContext.createBiquadFilter();
-  trebleEQ.type = "highshelf";
-  trebleEQ.frequency.value = 3000;
+      trebleEQ = audioContext.createBiquadFilter();
+      trebleEQ.type = "highshelf";
+      trebleEQ.frequency.value = 3000;
 
-  // FX nodes
-  reverb = audioContext.createConvolver();
-  delay = audioContext.createDelay();
-  filter = audioContext.createBiquadFilter();
-  filter.type = "lowpass";
-  filter.frequency.value = 10000;
+      source
+        .connect(bassEQ)
+        .connect(midEQ)
+        .connect(trebleEQ)
+        .connect(gainNode)
+        .connect(analyser)
+        .connect(audioContext.destination);
+    }
+    function drawVisualizer() {
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+  const leftCircle = document.getElementById("leftBeatCircle");
+  const rightCircle = document.getElementById("rightBeatCircle");
 
-  // FX Gain Controllers
-  reverbGain = audioContext.createGain();
-  delayGain = audioContext.createGain();
-  filterGain = audioContext.createGain();
+  function draw() {
+    animationId = requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(dataArray);
 
-  // Start FX as bypassed
-  reverbGain.gain.value = 0;
-  delayGain.gain.value = 0;
-  filterGain.gain.value = 1;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Load reverb impulse
-  fetch('https://cdn.jsdelivr.net/gh/mdn/webaudio-examples/audio-buffer/reverb.wav')
-    .then(res => res.arrayBuffer())
-    .then(buffer => audioContext.decodeAudioData(buffer))
-    .then(decoded => reverb.buffer = decoded);
+    const barWidth = (canvas.width / bufferLength) * 2.5;
+    let x = 0;
 
-  // Chain connections
-  source.connect(bassEQ);
-  bassEQ.connect(midEQ);
-  midEQ.connect(trebleEQ);
+    // Bass detection
+    const bassData = dataArray.slice(0, 20);
+    const bassAvg = bassData.reduce((a, b) => a + b, 0) / bassData.length;
+    const scale = 1 + (bassAvg / 255) * 0.5;
+    const hue = Math.floor((bassAvg / 255) * 360);
 
-  trebleEQ.connect(reverb);
-  trebleEQ.connect(delay);
-  trebleEQ.connect(filter);
+    // Beat-reactive background color
+    document.body.style.background = `hsl(${hue}, 70%, 10%)`;
 
-  reverb.connect(reverbGain);
-  delay.connect(delayGain);
-  filter.connect(filterGain);
+    // Beat-sync circles
+    if (leftCircle && rightCircle) {
+      leftCircle.style.transform = `scale(${scale})`;
+      rightCircle.style.transform = `scale(${scale})`;
+      leftCircle.style.background = `hsl(${hue}, 100%, 50%)`;
+      rightCircle.style.background = `hsl(${(hue + 180) % 360}, 100%, 50%)`;
+    }
 
-  // Merge all FX back into one signal
-  reverbGain.connect(gainNode);
-  delayGain.connect(gainNode);
-  filterGain.connect(gainNode);
+    // Multicolor visualizer
+    for (let i = 0; i < bufferLength; i++) {
+      const barHeight = dataArray[i];
+      const barHue = (i / bufferLength) * 360;
+      ctx.fillStyle = `hsl(${barHue}, 100%, 50%)`;
+      ctx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
+      x += barWidth + 1;
+    }
+  }
 
-  gainNode.connect(analyser);
-  analyser.connect(audioContext.destination);
+  draw();
 }
 
-    function drawVisualizer() {
-      const bufferLength = analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
 
-      function draw() {
-        animationId = requestAnimationFrame(draw);
-        analyser.getByteFrequencyData(dataArray);
-
-        ctx.fillStyle = "#000";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        const barWidth = (canvas.width / bufferLength) * 2.5;
-        let x = 0;
-
-        for (let i = 0; i < bufferLength; i++) {
-          const barHeight = dataArray[i];
-          ctx.fillStyle = `rgb(${barHeight + 100}, 255, 255)`;
-          ctx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
-          x += barWidth + 1;
-        }
-      }
-
-      draw();
-    }
 
     fileInput.addEventListener('change', function () {
       const file = fileInput.files[0];
