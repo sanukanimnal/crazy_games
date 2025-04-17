@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reaction Time Test</title>
+  <link rel="icon" type="image/x-icon" href="infinity.png">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 15px;
+      background: linear-gradient(270deg, #1a2a6c, #b21f1f, #fdbb2d);
+      background-size: 600% 600%;
+      animation: gradient 15s ease infinite;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      min-height: 100vh;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 5px;
+      text-shadow: 0 0 8px #00fff7;
+    }
+
+    .instructions {
+      font-size: 1rem;
+      color: #ffeb3b;
+      margin: 10px auto;
+      max-width: 600px;
+    }
+
+    .game {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .show { display: flex; }
+
+    #testBox {
+      width: 90%;
+      max-width: 320px;
+      height: 200px;
+      background-color: #ff3c3c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #testBox.ready {
+      background-color: #4caf50 !important;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 8px #4caf50; }
+      50% { box-shadow: 0 0 24px #4caf50; }
+      100% { box-shadow: 0 0 8px #4caf50; }
+    }
+
+    .result {
+      margin-top: 4px;
+      font-size: 1rem;
+      color: #00ffd5;
+    }
+
+    #keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 80px);
+      grid-gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .key {
+      width: 80px;
+      height: 80px;
+      font-size: 1.5rem;
+      border: none;
+      border-radius: 10px;
+      background: #37474f;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .flash {
+      background: #4caf50 !important;
+    }
+
+    .share-btn {
+      margin-top: 15px;
+      background-color: #25d366;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 0 10px #25d366;
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 10px;
+      color: #ccc;
+      background: rgba(0,0,0,0.2);
+      font-size: 0.9rem;
+      width: 100%;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.5rem; }
+      #testBox { height: 150px; font-size: 1rem; }
+      .key { width: 60px; height: 60px; font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <h1>⚡ Reaction Time Test</h1>
+
+
+  <div id="game1" class="game show">
+    <div class="instructions">
+        <p><strong>Game 1:</strong> Wait for the box to turn green and click as fast as you can. Do this 5 times.</p>
+      </div>
+    <div id="testBox">Wait for green...</div>
+    <div id="result1" class="result"></div>
+    <div id="average1" class="result"></div>
+  </div>
+
+
+  <div id="game2" class="game">
+    <div class="instructions">
+        <p><strong>Game 2:</strong> A keypad button will flash. Click it or press the same number on your keyboard as fast as possible. Do this 5 times.</p>
+      </div>
+    
+    <div id="keypad">
+      <button class="key" id="key7">7</button>
+      <button class="key" id="key8">8</button>
+      <button class="key" id="key9">9</button>
+      <button class="key" id="key4">4</button>
+      <button class="key" id="key5">5</button>
+      <button class="key" id="key6">6</button>
+      <button class="key" id="key1">1</button>
+      <button class="key" id="key2">2</button>
+      <button class="key" id="key3">3</button>
+    </div>
+    <div id="result2" class="result"></div>
+    <div id="average2" class="result"></div>
+    <div id="profession" class="result"></div>
+    <button class="share-btn" onclick="shareResult()">📤 Share Result on WhatsApp</button>
+  </div>
+
+  <footer>
+    <bold>Developed with ❤️ by Sanuka Nimnal <br>for reaction time accuracy & speed. Test your reflexes and share your results!</bold>
+  </footer>
+
+  <script>
+    function showGame(n) {
+      document.querySelectorAll('.game').forEach(g => g.classList.remove('show'));
+      document.getElementById('game' + n).classList.add('show');
+    }
+
+    const testBox = document.getElementById('testBox');
+    const result1 = document.getElementById('result1');
+    const average1 = document.getElementById('average1');
+    let timeout1, start1, total1 = 0, round1 = 0, max1 = 5;
+
+    function startGame1() {
+      result1.textContent = '';
+      average1.textContent = '';
+      testBox.textContent = 'Wait for green...';
+      testBox.classList.remove('ready');
+      testBox.style.backgroundColor = '#ff3c3c';
+      let delay = Math.random() * 3000 + 2000;
+      timeout1 = setTimeout(() => {
+        testBox.classList.add('ready');
+        testBox.textContent = 'CLICK!';
+        start1 = Date.now();
+      }, delay);
+    }
+
+    testBox.addEventListener('click', () => {
+      if (testBox.classList.contains('ready')) {
+        const time = (Date.now() - start1) / 1000;
+        total1 += time;
+        round1++;
+        testBox.classList.remove('ready');
+        testBox.style.backgroundColor = '#2196f3';
+        testBox.textContent = 'Good!';
+        if (round1 < max1) {
+          setTimeout(startGame1, 1000);
+        } else {
+          result1.textContent = '';
+          average1.textContent = `📊 Game 1 Average: ${(total1 / max1).toFixed(2)}s`;
+          setTimeout(() => {
+            showGame(2);
+            startGame2();
+          }, 1500);
+        }
+      } else {
+        clearTimeout(timeout1);
+        testBox.textContent = 'Too soon!';
+        testBox.style.backgroundColor = '#ff5252';
+      }
+    });
+
+    startGame1();
+
+    const keys = document.querySelectorAll('.key');
+    const result2 = document.getElementById('result2');
+    const average2 = document.getElementById('average2');
+    const profession = document.getElementById('profession');
+    let currentKey = null, start2, total2 = 0, round2 = 0, max2 = 5;
+
+    const professions = [
+      { max: 0.30, job: "F1 Driver" },
+      { max: 0.45, job: "Pilot" },
+      { max: 0.60, job: "Cricketer/Footballer" },
+      { max: 0.75, job: "Gamer" },
+      { max: 0.90, job: "Surgeon" },
+      { max: 1.10, job: "Teacher" },
+      { max: 1.40, job: "Driver" },
+      { max: 1.70, job: "Office Worker" },
+      { max: 2.00, job: "Factory Worker" },
+      { max: 5.00, job: "Lazy Cat" },
+      { max: 10.0, job: "Sleepy Koala" },
+      { max: 20.0, job: "Frozen Sloth" }
+    ];
+
+    function getProfession(avg) {
+      return professions.find(p => avg <= p.max).job;
+    }
+
+    function startGame2() {
+      result2.textContent = '';
+      average2.textContent = '';
+      profession.textContent = '';
+      keys.forEach(k => k.classList.remove('flash'));
+      let delay = Math.random() * 3000 + 2000;
+      setTimeout(() => {
+        const order = ['7','8','9','4','5','6','1','2','3'];
+        const rand = order[Math.floor(Math.random() * 9)];
+        currentKey = document.getElementById('key' + rand);
+        currentKey.classList.add('flash');
+        start2 = Date.now();
+      }, delay);
+    }
+
+    function handleClick(key) {
+      if (key === currentKey && currentKey.classList.contains('flash')) {
+        const time = (Date.now() - start2) / 1000;
+        total2 += time;
+        round2++;
+        currentKey.classList.remove('flash');
+        if (round2 < max2) {
+          result2.textContent = `⏱️ Round ${round2}: ${time.toFixed(2)}s`;
+          setTimeout(startGame2, 1000);
+        } else {
+          const avg1 = total1 / max1;
+          const avg2 = total2 / max2;
+          const avgBoth = (avg1 + avg2) / 2;
+          result2.textContent = '';
+          average2.textContent = `Game 1 Avg: ${avg1.toFixed(2)}s | Game 2 Avg: ${avg2.toFixed(2)}s | Overall Avg: ${avgBoth.toFixed(2)}s`;
+          profession.textContent = `👔 Best-Suited Profession: ${getProfession(avgBoth)}`;
+        }
+      }
+    }
+
+    keys.forEach(key => {
+      key.addEventListener('click', () => handleClick(key));
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key >= '1' && e.key <= '9') {
+        const key = document.getElementById('key' + e.key);
+        if (key) handleClick(key);
+      }
+    });
+
+    function shareResult() {
+      const avg1 = (total1 / max1).toFixed(2);
+      const avg2 = (total2 / max2).toFixed(2);
+      const avgBoth = ((parseFloat(avg1) + parseFloat(avg2)) / 2).toFixed(2);
+      const job = getProfession(avgBoth);
+      const bill = `⚡ *My average reaction speed is ${avgBoth}*\n\n 🤐 *and I have a reaction time of a ${job}.* \n\n😳 *What is your reaction time.*\n\n▶️ *Play now.*\n\n *https://sanukanimnal.github.io/crazy_games/ireaction_time.html*`;
+      const whatsappLink = `whatsapp://send?text=${encodeURIComponent(bill)}`;
+      window.open(whatsappLink, '_blank');
+    }
+  </script>
+</body>
+</html>
