@@ -83,7 +83,7 @@
         }
 
 
-        #logout-btn, #login-btn, #reset-account-btn {
+        #logout-btn, #login-btn, #reset-account-btn, #reset-prices-btn {
             background-color: var(--primary-color);
             color: white;
             padding: 10px 20px;
@@ -94,11 +94,11 @@
             transition: background-color 0.3s ease, transform 0.2s ease;
             box-shadow: 0 4px 8px rgba(0,0,0,0.4);
         }
-        #logout-btn:hover, #login-btn:hover, #reset-account-btn:hover {
+        #logout-btn:hover, #login-btn:hover, #reset-account-btn:hover, #reset-prices-btn:hover {
             background-color: #009ACD;
             transform: translateY(-2px);
         }
-        #logout-btn:active, #login-btn:active, #reset-account-btn:active {
+        #logout-btn:active, #login-btn:active, #reset-account-btn:active, #reset-prices-btn:active {
             transform: translateY(0);
         }
         #reset-account-btn {
@@ -107,6 +107,13 @@
         }
         #reset-account-btn:hover {
             background-color: #C0392B;
+        }
+        #reset-prices-btn {
+            background-color: #9B59B6; /* A distinct color for price reset, e.g., Amethyst */
+            margin-left: 10px;
+        }
+        #reset-prices-btn:hover {
+            background-color: #8E44AD;
         }
 
 
@@ -664,6 +671,7 @@
             <button id="login-btn" onclick="openAuthPopup('login')">Login / Register</button>
             <button id="logout-btn" style="display:none;" onclick="logout()">Logout</button>
             <button id="reset-account-btn" style="display:none;" onclick="resetAccount()">Reset Account</button>
+            <button id="reset-prices-btn" style="display:none;" onclick="resetPrices()">Reset Prices</button>
         </div>
     </div>
 
@@ -691,7 +699,6 @@
                 </div>
         </div>
     </div>
-$
     <div id="popup-overlay" class="overlay" onclick="closeAllPopups()"></div>
 
     <div id="stock-popup" class="popup">
@@ -740,7 +747,8 @@ $
         </form>
     </div>
 
-    <div id="notification-container"></div> <script>
+    <div id="notification-container"></div>
+    <script>
         // --- Global Variables and Constants ---
         let userBalance = 0.00;
         const INITIAL_BALANCE = 10000.00; // Define initial balance
@@ -748,33 +756,33 @@ $
         const PRICE_UPDATE_INTERVAL = 10000; // 10 seconds
         const NOTIFICATION_INTERVAL = 20000; // 20 seconds for notifications
         const MAX_HISTORY_POINTS = 20; // Number of price points to keep for the graph
+        const PRICE_MULTIPLIER = 300; // New constant for price scaling
 
-        // Real companies with varied initial prices and volatility for more dynamic changes
-let companies = [
-    { name: "John Keells Holdings PLC", symbol: "JKH.N0000", price: 210.00, stocksRemaining: 1000, volatility: 0.019, history: [], country: "Sri Lanka" },
-    { name: "LOLC Holdings PLC", symbol: "LOLC.N0000", price: 623.00, stocksRemaining: 700, volatility: 0.025, history: [], country: "Sri Lanka" },
-    { name: "Commercial Bank of Ceylon PLC", symbol: "COMB.N0000", price: 148.25, stocksRemaining: 1200, volatility: 0.015, history: [], country: "Sri Lanka" },
-    { name: "Hatton National Bank PLC", symbol: "HNB.N0000", price: 214.00, stocksRemaining: 1100, volatility: 0.016, history: [], country: "Sri Lanka" },
-    { name: "Dialog Axiata PLC", symbol: "DIAL.N0000", price: 17.60, stocksRemaining: 1500, volatility: 0.020, history: [], country: "Sri Lanka" },
-    { name: "Nestle Lanka PLC", symbol: "NEST.N0000", price: 1120.00, stocksRemaining: 400, volatility: 0.010, history: [], country: "Sri Lanka" }, // Note: Price might be from earlier in 2023/2024 based on search snippets
-    { name: "Sri Lanka Telecom PLC", symbol: "SLTL.N0000", price: 63.00, stocksRemaining: 1300, volatility: 0.018, history: [], country: "Sri Lanka" },
-    { name: "Expolanka Holdings PLC", symbol: "EXPO.N0000", price: 151.00, stocksRemaining: 800, volatility: 0.028, history: [], country: "Sri Lanka" }, // Note: Price might be from earlier in 2024 based on search snippets
-    { name: "Sampath Bank PLC", symbol: "SAMP.N0000", price: 115.50, stocksRemaining: 1000, volatility: 0.017, history: [], country: "Sri Lanka" },
-    { name: "Browns Investments PLC", symbol: "BIL.N0000", price: 8.20, stocksRemaining: 1800, volatility: 0.022, history: [], country: "Sri Lanka" },
-    { name: "Hayleys PLC", symbol: "HAYL.N0000", price: 137.00, stocksRemaining: 900, volatility: 0.020, history: [], country: "Sri Lanka" },
-    { name: "Access Engineering PLC", symbol: "AEL.N0000", price: 38.20, stocksRemaining: 1200, volatility: 0.019, history: [], country: "Sri Lanka" },
-    { name: "Vallibel One PLC", symbol: "VONE.N0000", price: 71.60, stocksRemaining: 850, volatility: 0.021, history: [], country: "Sri Lanka" },
-    { name: "Bukit Darah PLC", symbol: "BUKI.N0000", price: 414.75, stocksRemaining: 500, volatility: 0.012, history: [], country: "Sri Lanka" },
-    { name: "Carson Cumberbatch PLC", symbol: "CARS.N0000", price: 288.00, stocksRemaining: 600, volatility: 0.014, history: [], country: "Sri Lanka" }
-];
+        // Original, immutable base data for companies. Prices are now base values.
+        const INITIAL_COMPANIES_DATA = [
+            { name: "John Keells Holdings PLC", symbol: "JKH.N0000", price: 21.00 / PRICE_MULTIPLIER, stocksRemaining: 7962613, volatility: 0.019, history: [], country: "Sri Lanka" },
+            { name: "LOLC Holdings PLC", symbol: "LOLC.N0000", price: 621.00 / PRICE_MULTIPLIER, stocksRemaining: 619188, volatility: 0.025, history: [], country: "Sri Lanka" },
+            { name: "Commercial Bank of Ceylon PLC", symbol: "COMB.N0000", price: 153.00 / PRICE_MULTIPLIER, stocksRemaining: 746494, volatility: 0.015, history: [], country: "Sri Lanka" },
+            { name: "Hatton National Bank PLC", symbol: "HNB.N0000", price: 321.00 / PRICE_MULTIPLIER, stocksRemaining: 203533, volatility: 0.016, history: [], country: "Sri Lanka" },
+            { name: "Dialog Axiata PLC", symbol: "DIAL.N0000", price: 18.00 / PRICE_MULTIPLIER, stocksRemaining: 3163154, volatility: 0.020, history: [], country: "Sri Lanka" },
+            { name: "Sri Lanka Telecom PLC", symbol: "SLTL.N0000", price: 63.00 / PRICE_MULTIPLIER, stocksRemaining: 57238, volatility: 0.018, history: [], country: "Sri Lanka" },
+            { name: "Sampath Bank PLC", symbol: "SAMP.N0000", price: 39.00 / PRICE_MULTIPLIER, stocksRemaining: 1054296, volatility: 0.017, history: [], country: "Sri Lanka" },
+            { name: "Browns Investments PLC", symbol: "BIL.N0000", price: 6.00   / PRICE_MULTIPLIER, stocksRemaining: 18631081, volatility: 0.022, history: [], country: "Sri Lanka" },
+            { name: "Hayleys PLC", symbol: "HAYL.N0000", price: 156.00 / PRICE_MULTIPLIER, stocksRemaining: 811710, volatility: 0.020, history: [], country: "Sri Lanka" },
+            { name: "Access Engineering PLC", symbol: "AEL.N0000", price: 42.14 / PRICE_MULTIPLIER, stocksRemaining: 3790884, volatility: 0.019, history: [], country: "Sri Lanka" },
+            { name: "Vallibel One PLC", symbol: "VONE.N0000", price: 75.00 / PRICE_MULTIPLIER, stocksRemaining: 1226544, volatility: 0.021, history: [], country: "Sri Lanka" },
+            { name: "Hemas Holdings PLC", symbol: "HHL.N0000", price: 27.00 / PRICE_MULTIPLIER, stocksRemaining: 9588068, volatility: 0.014, history: [], country: "Sri Lanka" },
+            { name: "Nawaloka Hospitals PLC", symbol: "NHL.N0000", price: 6.00 / PRICE_MULTIPLIER, stocksRemaining: 119923, volatility: 0.014, history: [], country: "Sri Lanka" },
+            { name: "Swisstek PLC", symbol: "PARQ.N0000", price: 72.00 / PRICE_MULTIPLIER, stocksRemaining: 2612365, volatility: 0.014, history: [], country: "Sri Lanka" }
+        ];
+
+        let companies = []; // This will hold the mutable company data, initialized from INITIAL_COMPANIES_DATA
 
         let portfolio = {}; // { symbol: { quantity: X, purchasePrice: Y } }
         let transactionHistory = []; // [{ type: 'buy/sell', symbol: 'AAPL', quantity: 5, price: 170.50, timestamp: '...', profitLoss: null }]
         let favoriteCompanies = []; // Array of symbols for favorite companies
 
         // Persistent data structure for users (in localStorage)
-        // localStorage.setItem('users', JSON.stringify({ 'user1': { balance: 10000, portfolio: {}, history: [], favorites: [] } }));
-        // This is highly insecure for passwords in a real app!
         let usersData = JSON.parse(localStorage.getItem('users') || '{}');
 
         // DOM Elements
@@ -802,6 +810,7 @@ let companies = [
         const loginBtn = document.getElementById('login-btn');
         const logoutBtn = document.getElementById('logout-btn');
         const resetAccountBtn = document.getElementById('reset-account-btn'); // New element
+        const resetPricesBtn = document.getElementById('reset-prices-btn'); // New element
         const mainContentDiv = document.getElementById('main-content');
         const authPopup = document.getElementById('auth-popup');
         const authTitle = document.getElementById('auth-title');
@@ -844,9 +853,32 @@ let companies = [
                 };
                 localStorage.setItem('users', JSON.stringify(usersData));
             }
+            // Save current state of companies data (prices and history)
+            localStorage.setItem('companiesData', JSON.stringify(companies));
         }
 
         function loadUserData() {
+            // Load companies data first
+            const savedCompanies = JSON.parse(localStorage.getItem('companiesData'));
+            if (savedCompanies && savedCompanies.length > 0) {
+                companies = savedCompanies;
+                // Ensure history array exists and is trimmed
+                companies.forEach(company => {
+                    if (!company.history) {
+                        company.history = [company.price];
+                    } else if (company.history.length > MAX_HISTORY_POINTS) {
+                        company.history = company.history.slice(-MAX_HISTORY_POINTS);
+                    }
+                });
+            } else {
+                // If no saved companies data, use initial data and initialize history
+                companies = JSON.parse(JSON.stringify(INITIAL_COMPANIES_DATA)); // Deep copy
+                companies.forEach(company => {
+                    company.history = [company.price];
+                });
+            }
+
+
             if (currentUser && usersData[currentUser]) {
                 const userData = usersData[currentUser];
                 userBalance = userData.balance !== undefined ? userData.balance : INITIAL_BALANCE;
@@ -863,6 +895,7 @@ let companies = [
             updateAccountPLDisplay(); // Call new function
             updatePortfolioDisplay();
             updateHistoryDisplay();
+            renderCompanies(); // Re-render companies grid after loading data
         }
 
         // --- UI Update Functions ---
@@ -877,10 +910,10 @@ let companies = [
                 const item = portfolio[symbol];
                 const company = companies.find(c => c.symbol === symbol);
                 if (company) {
-                    totalPortfolioValue += item.quantity * company.price;
+                    totalPortfolioValue += item.quantity * (company.price * PRICE_MULTIPLIER);
                 }
             }
-            const totalInvested = Object.values(portfolio).reduce((sum, item) => sum + (item.quantity * item.purchasePrice), 0);
+            const totalInvested = Object.values(portfolio).reduce((sum, item) => sum + (item.quantity * (item.purchasePrice * PRICE_MULTIPLIER)), 0);
 
             const accountProfitLoss = (userBalance + totalPortfolioValue) - (INITIAL_BALANCE + totalInvested);
 
@@ -941,18 +974,19 @@ let companies = [
             const factor = (Math.random() * 2 - 1) * volatility * 0.5;
             let newPrice = currentPrice * (1 + factor);
 
-            if (newPrice < 0.50) {
-                newPrice = 0.50 + Math.random() * 0.5;
+            // Ensure price does not go below a reasonable minimum (base price)
+            if (newPrice < 0.01 / PRICE_MULTIPLIER) {
+                newPrice = (0.01 + Math.random() * 0.01) / PRICE_MULTIPLIER;
             }
-            return parseFloat(newPrice.toFixed(2));
+            return parseFloat(newPrice.toFixed(5)); // Keep more precision for base price
         }
 
         function updateAllStockPrices() {
             companies.forEach(company => {
-                const oldPrice = company.price;
+                const oldPriceBase = company.price;
                 company.price = generateNewPrice(company.price, company.volatility);
 
-                company.history.push(company.price);
+                company.history.push(company.price); // Store base price in history
                 if (company.history.length > MAX_HISTORY_POINTS) {
                     company.history.shift();
                 }
@@ -961,9 +995,9 @@ let companies = [
                 if (card) {
                     const priceSpan = card.querySelector('.stock-price-value');
                     const changeSpan = card.querySelector('.price-change');
-                    const diff = company.price - oldPrice;
+                    const diff = (company.price - oldPriceBase) * PRICE_MULTIPLIER; // Calculate diff based on multiplied price
 
-                    priceSpan.textContent = company.price.toFixed(2);
+                    priceSpan.textContent = (company.price * PRICE_MULTIPLIER).toFixed(2);
                     changeSpan.textContent = `${diff >= 0 ? '+' : ''}${diff.toFixed(2)}`;
                     changeSpan.classList.remove('price-up', 'price-down', 'price-neutral');
                     if (diff > 0) {
@@ -976,7 +1010,7 @@ let companies = [
                 }
 
                 if (currentCompanySymbol === company.symbol && stockPopup.style.display === 'block') {
-                    popupStockPrice.textContent = company.price.toFixed(2);
+                    popupStockPrice.textContent = (company.price * PRICE_MULTIPLIER).toFixed(2);
                     updateStockChart(company);
                 }
             });
@@ -1002,12 +1036,13 @@ let companies = [
                 companyCard.classList.add('company-card');
                 companyCard.dataset.symbol = company.symbol;
 
-                if (company.history.length < 2) {
-                    company.history.unshift(company.price);
+                // Ensure history has at least one point for initial rendering
+                if (!company.history || company.history.length === 0) {
+                    company.history = [company.price]; // Store base price
                 }
 
-                const prevPrice = company.history[company.history.length - 2] || company.price;
-                const diff = company.price - prevPrice;
+                const prevPriceBase = company.history[company.history.length - 2] || company.price; // Get base price
+                const diff = (company.price - prevPriceBase) * PRICE_MULTIPLIER; // Calculate diff based on multiplied price
                 let priceChangeClass = 'price-neutral';
                 if (diff > 0) priceChangeClass = 'price-up';
                 else if (diff < 0) priceChangeClass = 'price-down';
@@ -1024,7 +1059,7 @@ let companies = [
                     <div class="company-country">${company.country}</div>
                     <div class="company-details">
                         Stocks Available: ${company.stocksRemaining}<br>
-                        Price: $<span class="stock-price stock-price-value">${company.price.toFixed(2)}</span>
+                        Price: LKR<span class="stock-price stock-price-value">${(company.price * PRICE_MULTIPLIER).toFixed(2)}</span>
                         <span class="price-change ${priceChangeClass}">${priceChangeText}</span>
                     </div>
                     <div class="mini-chart-container" style="height: 60px; width: 100%; margin-top: 10px;">
@@ -1069,7 +1104,7 @@ let companies = [
 
             popupCompanyName.textContent = company.name;
             popupRemainingStocks.textContent = company.stocksRemaining;
-            popupStockPrice.textContent = company.price.toFixed(2);
+            popupStockPrice.textContent = (company.price * PRICE_MULTIPLIER).toFixed(2); // Display multiplied price
             buyQuantityInput.value = 1;
 
             if (portfolio[symbol] && portfolio[symbol].quantity > 0) {
@@ -1112,8 +1147,8 @@ let companies = [
                 miniCharts[company.symbol].destroy();
             }
 
-            // Ensure there's at least one data point for the chart to render
-            const data = company.history.length > 0 ? company.history : [company.price];
+            // Data for chart should be multiplied prices
+            const data = company.history.length > 0 ? company.history.map(p => p * PRICE_MULTIPLIER) : [(company.price * PRICE_MULTIPLIER)];
 
             miniCharts[company.symbol] = new Chart(ctx, {
                 type: 'line',
@@ -1160,7 +1195,8 @@ let companies = [
         function updateMiniCharts() {
             companies.forEach(company => {
                 if (miniCharts[company.symbol]) {
-                    const data = company.history.length > 0 ? company.history : [company.price];
+                    // Data for chart should be multiplied prices
+                    const data = company.history.length > 0 ? company.history.map(p => p * PRICE_MULTIPLIER) : [(company.price * PRICE_MULTIPLIER)];
                     miniCharts[company.symbol].data.datasets[0].data = data;
                     miniCharts[company.symbol].update('none'); // 'none' for no animation
                 } else {
@@ -1183,13 +1219,16 @@ let companies = [
                 return timeAgo === 0 ? 'Now' : `${timeAgo}s ago`;
             });
 
+            // Chart data should be multiplied prices
+            const chartData = company.history.map(p => p * PRICE_MULTIPLIER);
+
             stockChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: `${company.symbol} Price`,
-                        data: company.history,
+                        data: chartData,
                         borderColor: getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim(),
                         backgroundColor: varToRgba('--primary-color', 0.2),
                         fill: true,
@@ -1227,13 +1266,13 @@ let companies = [
                             display: true,
                             title: {
                                 display: true,
-                                text: 'Price ($)',
+                                text: 'Price (LKR)',
                                 font: { size: 14, family: 'Poppins', color: varToRgba('--text-color', 0.8) }
                             },
                             beginAtZero: false,
                             ticks: {
                                 callback: function(value) {
-                                    return '$' + value.toFixed(2);
+                                    return 'LKR' + value.toFixed(2);
                                 },
                                 font: { size: 12, family: 'Poppins', color: varToRgba('--text-color', 0.7) }
                             },
@@ -1249,7 +1288,7 @@ let companies = [
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return `${context.dataset.label}: $${context.parsed.y.toFixed(2)}`;
+                                    return `${context.dataset.label}: LKR${context.parsed.y.toFixed(2)}`;
                                 }
                             },
                             bodyFont: { family: 'Poppins' },
@@ -1270,7 +1309,7 @@ let companies = [
                     return timeAgo === 0 ? 'Now' : `${timeAgo}s ago`;
                 });
                 stockChart.data.labels = labels;
-                stockChart.data.datasets[0].data = company.history;
+                stockChart.data.datasets[0].data = company.history.map(p => p * PRICE_MULTIPLIER); // Chart data should be multiplied prices
                 stockChart.update('none');
             }
         }
@@ -1289,7 +1328,7 @@ let companies = [
                 return;
             }
 
-            const cost = quantity * company.price;
+            const cost = quantity * (company.price * PRICE_MULTIPLIER); // Calculate cost with multiplied price
             if (userBalance < cost) {
                 displayPopupMessage("Not enough funds to complete this purchase.", true);
                 return;
@@ -1299,10 +1338,12 @@ let companies = [
             company.stocksRemaining -= quantity;
 
             if (portfolio[company.symbol]) {
-                const currentTotalCost = portfolio[company.symbol].quantity * portfolio[company.symbol].purchasePrice;
+                const currentTotalCost = portfolio[company.symbol].quantity * (portfolio[company.symbol].purchasePrice * PRICE_MULTIPLIER);
                 portfolio[company.symbol].quantity += quantity;
-                portfolio[company.symbol].purchasePrice = (currentTotalCost + cost) / portfolio[company.symbol].quantity;
+                // Store average purchase price as base price
+                portfolio[company.symbol].purchasePrice = (currentTotalCost + cost) / portfolio[company.symbol].quantity / PRICE_MULTIPLIER;
             } else {
+                // Store purchase price as base price
                 portfolio[company.symbol] = {
                     quantity: quantity,
                     purchasePrice: company.price
@@ -1314,7 +1355,7 @@ let companies = [
                 symbol: company.symbol,
                 name: company.name,
                 quantity: quantity,
-                price: company.price,
+                price: company.price * PRICE_MULTIPLIER, // Store transaction price as multiplied price
                 timestamp: new Date().toLocaleString(),
                 profitLoss: null
             });
@@ -1325,7 +1366,7 @@ let companies = [
             renderCompanies();
             updatePortfolioDisplay();
             updateHistoryDisplay();
-            displayPopupMessage(`Successfully purchased ${quantity} shares of ${company.name} for $${cost.toFixed(2)}.`);
+            displayPopupMessage(`Successfully purchased ${quantity} shares of ${company.name} for LKR${cost.toFixed(2)}.`);
             openStockPopup(currentCompanySymbol);
         }
 
@@ -1349,9 +1390,9 @@ let companies = [
                 return;
             }
 
-            const revenue = quantityToSell * company.price;
-            const profitLossPerShare = company.price - ownedStock.purchasePrice;
-            const totalProfitLoss = quantityToSell * profitLossPerShare;
+            const revenue = quantityToSell * (company.price * PRICE_MULTIPLIER); // Calculate revenue with multiplied price
+            const profitLossPerShare = (company.price * PRICE_MULTIPLIER) - (ownedStock.purchasePrice * PRICE_MULTIPLIER); // Calculate P/L per share with multiplied prices
+            const totalProfitLoss = quantityToSell * profitLossPerShare; // Total P/L is already multiplied
 
             userBalance += revenue;
             company.stocksRemaining += quantityToSell;
@@ -1366,9 +1407,9 @@ let companies = [
                 symbol: company.symbol,
                 name: company.name,
                 quantity: quantityToSell,
-                price: company.price,
+                price: company.price * PRICE_MULTIPLIER, // Store transaction price as multiplied price
                 timestamp: new Date().toLocaleString(),
-                profitLoss: totalProfitLoss
+                profitLoss: totalProfitLoss // Store total P/L as multiplied value
             });
 
             saveUserData();
@@ -1377,7 +1418,7 @@ let companies = [
             renderCompanies();
             updatePortfolioDisplay();
             updateHistoryDisplay();
-            displayPopupMessage(`Sold ${quantityToSell} shares of ${company.name}. You ${totalProfitLoss >= 0 ? 'gained' : 'lost'} $${Math.abs(totalProfitLoss).toFixed(2)}.`);
+            displayPopupMessage(`Sold ${quantityToSell} shares of ${company.name}. You ${totalProfitLoss >= 0 ? 'gained' : 'lost'} LKR${Math.abs(totalProfitLoss).toFixed(2)}.`);
 
             if (portfolio[currentCompanySymbol] && portfolio[currentCompanySymbol].quantity > 0) {
                 openStockPopup(currentCompanySymbol);
@@ -1398,9 +1439,9 @@ let companies = [
                     const company = companies.find(c => c.symbol === symbol);
                     if (!company) continue;
 
-                    const currentMarketPrice = company.price;
+                    const currentMarketPrice = company.price * PRICE_MULTIPLIER; // Get multiplied price
                     const currentValue = item.quantity * currentMarketPrice;
-                    const purchaseValue = item.quantity * item.purchasePrice;
+                    const purchaseValue = item.quantity * (item.purchasePrice * PRICE_MULTIPLIER); // Get multiplied purchase price
                     const profitLoss = currentValue - purchaseValue;
                     totalPortfolioProfitLoss += profitLoss; // Add to total
 
@@ -1409,10 +1450,10 @@ let companies = [
                     portfolioItemDiv.innerHTML = `
                         <div><strong>${company.name} (${symbol})</strong></div>
                         <div>Qty: ${item.quantity}</div>
-                        <div>Avg. Buy Price: $${item.purchasePrice.toFixed(2)}</div>
-                        <div>Current Price: $${currentMarketPrice.toFixed(2)}</div>
+                        <div>Avg. Buy Price: LKR${(item.purchasePrice * PRICE_MULTIPLIER).toFixed(2)}</div>
+                        <div>Current Price: LKR${currentMarketPrice.toFixed(2)}</div>
                         <div class="profit-loss ${profitLoss >= 0 ? 'profit' : 'loss'}">
-                            P/L: $${Math.abs(profitLoss).toFixed(2)}
+                            P/L: LKR${Math.abs(profitLoss).toFixed(2)}
                         </div>
                     `;
                     portfolioListDiv.appendChild(portfolioItemDiv);
@@ -1422,7 +1463,7 @@ let companies = [
             if (hasStocks) {
                 noPortfolioMessage.style.display = 'none';
                 totalProfitLossDisplay.style.display = 'block';
-                totalPLValueSpan.textContent = `${totalPortfolioProfitLoss >= 0 ? '+' : '-'}$${Math.abs(totalPortfolioProfitLoss).toFixed(2)}`;
+                totalPLValueSpan.textContent = `${totalPortfolioProfitLoss >= 0 ? '+' : '-'}${Math.abs(totalPortfolioProfitLoss).toFixed(2)}`;
                 totalProfitLossDisplay.classList.remove('profit-total', 'loss-total', 'neutral-total');
                 if (totalPortfolioProfitLoss > 0) {
                     totalProfitLossDisplay.classList.add('profit-total');
@@ -1451,12 +1492,12 @@ let companies = [
                 historyItemDiv.classList.add('history-item');
                 const typeClass = transaction.type === 'buy' ? 'buy-transaction' : 'sell-transaction';
                 const profitLossText = transaction.profitLoss !== null
-                    ? `<span class="profit-loss ${transaction.profitLoss >= 0 ? 'profit' : 'loss'}">P/L: $${Math.abs(transaction.profitLoss).toFixed(2)}</span>`
+                    ? `<span class="profit-loss ${transaction.profitLoss >= 0 ? 'profit' : 'loss'}">P/L: LKR${Math.abs(transaction.profitLoss).toFixed(2)}</span>`
                     : '';
 
                 historyItemDiv.innerHTML = `
                     <div><strong class="${typeClass}">${transaction.type.toUpperCase()}</strong>: ${transaction.name} (${transaction.symbol})</div>
-                    <div>Qty: ${transaction.quantity} @ $${transaction.price.toFixed(2)}</div>
+                    <div>Qty: ${transaction.quantity} @ LKR${transaction.price.toFixed(2)}</div>
                     <div>${transaction.timestamp}</div>
                     ${profitLossText}
                 `;
@@ -1529,8 +1570,9 @@ let companies = [
             loginBtn.style.display = 'none';
             logoutBtn.style.display = 'inline-block';
             resetAccountBtn.style.display = 'inline-block'; // Show reset button
+            resetPricesBtn.style.display = 'inline-block'; // Show reset prices button
             mainContentDiv.style.display = 'flex';
-            loadUserData();
+            loadUserData(); // This will now load companies data too
             startPriceUpdates();
             startNotificationUpdates(); // Start notifications after login
             localStorage.setItem('lastLoggedInUser', currentUser); // Persist last logged in user
@@ -1550,7 +1592,7 @@ let companies = [
                     delete miniCharts[symbol];
                 }
             }
-            saveUserData(); // Save current user's data before logging out
+            saveUserData(); // Save current user's data and companies data before logging out
 
             currentUser = null;
             userBalance = 0.00; // Reset balance on logout
@@ -1565,8 +1607,12 @@ let companies = [
             loginBtn.style.display = 'inline-block';
             logoutBtn.style.display = 'none';
             resetAccountBtn.style.display = 'none'; // Hide reset button
+            resetPricesBtn.style.display = 'none'; // Hide reset prices button
             mainContentDiv.style.display = 'none';
-            companies.forEach(company => company.history = [company.price]); // Reset company histories for next user
+            
+            // Reset companies to default state for next session start if not explicitly saved
+            // This is handled by loadUserData on next login, so no need to explicitly reset here.
+            
             renderCompanies(); // Re-render with default state (no favorites)
             closeAllPopups();
             localStorage.removeItem('lastLoggedInUser'); // Remove last logged in user
@@ -1575,12 +1621,37 @@ let companies = [
 
         function resetAccount() {
             if (!currentUser) return; // Should not happen if button is shown
-            const confirmReset = confirm(`Are you sure you want to reset your account, ${currentUser}? This will delete all your trades and reset your balance.`);
+            const confirmReset = window.confirm(`Are you sure you want to reset your account, ${currentUser}? This will delete all your trades and reset your balance.`);
             if (confirmReset) {
                 delete usersData[currentUser]; // Delete user data from global object
                 localStorage.setItem('users', JSON.stringify(usersData)); // Update localStorage
-                alert("Your account has been reset. You will now be logged out.");
+                window.alert("Your account has been reset. You will now be logged out.");
                 logout(); // Log out and go to login screen
+            }
+        }
+
+        function resetPrices() {
+            if (!currentUser) {
+                // This case should ideally not be reachable if the button is hidden when not logged in
+                return;
+            }
+            // Using a custom modal instead of alert/confirm for better UX and consistency
+            const userConfirmed = window.confirm("Are you sure you want to reset all stock prices to their base values? This cannot be undone.");
+
+            if (userConfirmed) {
+                // Reset each company's price and history to its initial state
+                companies.forEach(company => {
+                    const initialData = INITIAL_COMPANIES_DATA.find(d => d.symbol === company.symbol);
+                    if (initialData) {
+                        company.price = initialData.price; // Set to base price
+                        company.history = [initialData.price]; // Reset history to just the initial base price
+                    }
+                });
+                renderCompanies(); // Re-render the market overview
+                updatePortfolioDisplay(); // Portfolio values might be affected by price changes
+                updateAccountPLDisplay(); // Account P/L might be affected
+                saveUserData(); // Save the new company states (which now include reset prices)
+                showNotification("All stock prices have been reset to their base values.");
             }
         }
 
@@ -1602,15 +1673,7 @@ let companies = [
             if (priceUpdateIntervalId) {
                 clearInterval(priceUpdateIntervalId);
             }
-            // Ensure company histories are initialized for the current session,
-            // especially after a fresh login or app load.
-            companies.forEach(company => {
-                if (!company.history || company.history.length === 0) {
-                    company.history = [company.price];
-                } else if (company.history.length > MAX_HISTORY_POINTS) {
-                    company.history = company.history.slice(-MAX_HISTORY_POINTS); // Trim if too long
-                }
-            });
+            // `loadUserData` already initializes/trims company histories, so no need here.
             renderCompanies();
             priceUpdateIntervalId = setInterval(() => {
                 updateAllStockPrices();
@@ -1630,11 +1693,16 @@ let companies = [
 
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Load all users data to check for last logged in user
+            usersData = JSON.parse(localStorage.getItem('users') || '{}');
+
             const lastLoggedInUser = localStorage.getItem('lastLoggedInUser');
             if (lastLoggedInUser && usersData[lastLoggedInUser]) {
                 currentUser = lastLoggedInUser;
                 loginSuccess();
             } else {
+                // Initial load of companies data even before login to display market
+                loadUserData(); 
                 openAuthPopup('login');
             }
         });
