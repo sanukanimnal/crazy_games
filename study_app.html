@@ -1,0 +1,2318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Learning Hub - Your Personalized Study Companion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.min.js"></script>
+    <style>
+        /* --- INTERNAL CSS (New Theme & Animations) --- */
+        :root {
+            --primary-blue: #4DA8DA;
+            --secondary-teal: #80D8C3;
+            --accent-yellow: #FFD66B;
+            --light-bg: #F5F5F5;
+            --dark-text: #333;
+            --light-text: #F5F5F5;
+            --card-bg: rgba(255, 255, 255, 0.9); /* Slightly transparent white for cards */
+            --input-bg: #E0E0E0;
+            --button-bg: var(--primary-blue);
+            --button-hover-bg: #3c92bf; /* Slightly darker blue */
+            --border-color: rgba(0, 0, 0, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.15);
+            --font-family-header: 'Poppins', sans-serif;
+            --font-family-body: 'Open Sans', sans-serif;
+            --transition-speed: 0.3s ease;
+
+            /* Dynamic background colors */
+            --bg-start-morning: #ADD8E6; /* Light Blue */
+            --bg-end-morning: #80D8C3;   /* Teal */
+            --bg-start-afternoon: #4DA8DA; /* Primary Blue */
+            --bg-end-afternoon: #80D8C3;   /* Teal */
+            --bg-start-evening: #2C3E50; /* Dark Blue */
+            --bg-end-evening: #475E71;   /* Darker Grey-Blue */
+            --bg-start-night: #1A2A3A;   /* Very Dark Blue */
+            --bg-end-night: #3A4A5A;     /* Dark Grey-Blue */
+        }
+
+        body {
+            font-family: var(--font-family-body);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-teal) 100%); /* Default */
+            color: var(--dark-text);
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: 280px 1fr; /* Wider sidebar */
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+            background-attachment: fixed; /* Keep gradient fixed */
+            transition: background 1s ease-in-out; /* Smooth transition for background change */
+        }
+
+        /* Layout Grid Areas */
+        header { grid-area: 1 / 1 / 2 / 3; }
+        .sidebar { grid-area: 2 / 1 / 3 / 2; }
+        .main-content { grid-area: 2 / 2 / 3 / 3; }
+        footer { grid-area: 3 / 1 / 4 / 3; }
+
+        header {
+            background-color: var(--primary-blue);
+            padding: 25px 35px;
+            text-align: center;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--light-text);
+        }
+
+        header h1 {
+            font-family: var(--font-family-header);
+            font-size: 2.8rem;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        #greetings, #motivation-quote {
+            margin-top: 10px;
+            font-style: italic;
+            font-weight: 300;
+            font-size: 1.15rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .sidebar {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-right: 1px solid var(--border-color);
+            box-shadow: 4px 0 15px var(--shadow-color);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            z-index: 90;
+            gap: 15px;
+            padding-bottom: 0; /* Remove default padding for better control of list margin */
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 12px;
+        }
+
+        .sidebar nav ul li button {
+            background: none;
+            border: none;
+            color: var(--dark-text);
+            font-family: var(--font-family-header);
+            font-size: 1.2rem;
+            padding: 15px 20px;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color var(--transition-speed), color var(--transition-speed), transform 0.2s ease, box-shadow var(--transition-speed);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden; /* For pseudo-element animation */
+        }
+
+        .sidebar nav ul li button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.4s ease;
+        }
+
+        .sidebar nav ul li button:hover::before {
+            left: 100%;
+        }
+
+        .sidebar nav ul li button:hover {
+            background-color: var(--button-hover-bg);
+            color: var(--light-text);
+            transform: translateX(8px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .sidebar nav ul li button.active {
+            background-color: var(--primary-blue);
+            color: var(--light-text);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(0); /* Remove transform for active state */
+        }
+
+        .sidebar nav ul li button i {
+            font-size: 1.4rem;
+            color: var(--secondary-teal);
+            transition: color var(--transition-speed);
+        }
+
+        .sidebar nav ul li button.active i {
+             color: var(--accent-yellow); /* Change icon color when active */
+        }
+
+        .main-content {
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            box-sizing: border-box;
+            /* Removed background and backdrop-filter from main-content to simplify layering */
+            /* The tab-content itself will have the background */
+        }
+
+        .tab-content {
+            display: none; /* Hidden by default */
+            flex-grow: 1;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 35px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            height: 100%;
+            box-sizing: border-box;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            opacity: 0;
+            transform: translateY(20px);
+            flex-direction: column; /* Use flex for internal layout of content */
+            gap: 20px; /* Space between internal cards */
+        }
+
+        .tab-content.active {
+            display: flex; /* Show when active */
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card {
+            background-color: var(--light-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            flex-shrink: 0; /* Prevent cards from shrinking */
+        }
+
+        h2 {
+            font-family: var(--font-family-header);
+            color: var(--primary-blue);
+            margin-top: 0;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        h3 {
+            font-family: var(--font-family-header);
+            color: var(--secondary-teal);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        button {
+            background-color: var(--button-bg);
+            color: var(--light-text);
+            border: none;
+            padding: 14px 22px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            transition: background-color var(--transition-speed), transform 0.2s ease, box-shadow 0.2s ease;
+            margin-right: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background-color: var(--button-hover-bg);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        select,
+        textarea {
+            width: calc(100% - 28px); /* Account for padding and border */
+            padding: 14px;
+            margin-bottom: 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: var(--input-bg);
+            color: var(--dark-text);
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(77, 168, 218, 0.3);
+            background-color: #fff;
+        }
+
+        input::placeholder {
+            color: rgba(51, 51, 51, 0.6);
+        }
+
+        .time-display {
+            font-size: 3.5rem;
+            font-family: 'Poppins', monospace;
+            font-weight: 700;
+            color: var(--primary-blue);
+            text-align: center;
+            margin-bottom: 30px;
+            background: var(--light-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+            animation: pulse-timer 1.5s infinite alternate; /* Timer animation */
+        }
+
+        @keyframes pulse-timer {
+            from { transform: scale(1); box-shadow: inset 0 0 15px rgba(0,0,0,0.1); }
+            to { transform: scale(1.01); box-shadow: inset 0 0 20px rgba(0,0,0,0.2); }
+        }
+
+        .break-timer-display {
+            color: var(--secondary-teal);
+        }
+
+        .to-do-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+
+        .to-do-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px dashed var(--border-color);
+            transition: background-color var(--transition-speed);
+        }
+
+        .to-do-item:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+            border-radius: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .to-do-item:last-child {
+            border-bottom: none;
+        }
+
+        .to-do-item span {
+            cursor: pointer;
+            flex-grow: 1;
+            padding: 5px;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .to-do-item.completed span {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .to-do-item .actions button {
+            background: none;
+            border: none;
+            color: var(--primary-blue);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 8px 10px;
+            margin-right: 0;
+            transition: color var(--transition-speed);
+            box-shadow: none; /* Override general button shadow */
+        }
+
+        .to-do-item .actions button:hover {
+            color: var(--secondary-teal);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .subject-stats ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .subject-stats li {
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 1.1rem;
+        }
+
+        .subject-stats li:last-child {
+            border-bottom: none;
+        }
+
+        .subject-stats span:first-child {
+            font-weight: 600;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: var(--input-bg);
+            border-radius: 10px;
+            height: 25px;
+            margin-top: 15px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--secondary-teal);
+            width: var(--progress-width, 0%); /* Use CSS variable for initial width */
+            border-radius: 10px;
+            transition: width 0.6s ease-in-out;
+            background: linear-gradient(90deg, var(--secondary-teal) 0%, var(--accent-yellow) 100%);
+            /* Removed keyframe animation from here as width is set directly now */
+        }
+
+        #daily-goal-status {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: var(--primary-blue);
+        }
+
+        footer {
+            background-color: var(--primary-blue);
+            padding: 18px;
+            text-align: center;
+            font-size: 0.95rem;
+            border-top: 2px solid var(--border-color);
+            color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 -4px 20px var(--shadow-color);
+            z-index: 100;
+        }
+
+        /* Music Iframe Specifics - Styled to look like a phone */
+        #music-iframe-container {
+            background-color: var(--light-bg);
+            border-radius: 20px; /* More rounded corners like a phone */
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+            display: none; /* Hidden by default */
+            margin: 20px auto; /* Centered, "phone space" */
+            flex-direction: column;
+            gap: 10px;
+            border: 2px solid #555; /* Phone bezel effect */
+            max-width: 375px; /* Phone width */
+            box-sizing: border-box; /* Include padding and border in width */
+            aspect-ratio: 375 / 667; /* Maintain phone aspect ratio */
+            height: 667px; /* Fixed height for iframe container */
+        }
+
+        #music-iframe-container.active {
+            display: flex; /* Show when active */
+        }
+
+        #music-iframe {
+            width: 100%;
+            height: 100%; /* Iframe takes full height of its container */
+            border: 1px solid var(--border-color);
+            border-radius: 10px; /* Rounded corners inside iframe */
+        }
+
+        /* Schedule Section Specifics */
+        .schedule-entry {
+            display: grid;
+            grid-template-columns: 100px 150px 1fr auto; /* Day, Time, Subject, Actions */
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 1.05rem;
+        }
+
+        .schedule-entry:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-entry select, .schedule-entry input {
+            margin-bottom: 0;
+        }
+
+        .schedule-entry .actions button {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        /* Chart Styling */
+        #subject-time-chart-container,
+        #daily-time-chart-container {
+            position: relative;
+            margin: auto;
+            width: 80%; /* Adjust as needed */
+            max-width: 500px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Initial Setup Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--light-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content h3 {
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+        }
+
+        .modal-content input[type="number"] {
+            width: calc(100% - 40px);
+            margin-bottom: 20px;
+        }
+
+        .modal-content button {
+            width: auto;
+            margin: 0 auto;
+            display: block;
+        }
+
+        /* Fullscreen App Overlay */
+        #fullscreen-app-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: none; /* Controlled by JS */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #fullscreen-app-iframe {
+            width: 95%; /* Make it slightly smaller than 100% */
+            height: 95%; /* Make it slightly smaller than 100% */
+            border: none;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+        }
+
+        #iframe-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        #iframe-timer-display {
+            color: white;
+            font-family: 'Poppins', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        #close-fullscreen-app-btn {
+            background-color: #e74c3c; /* Red color for close */
+            color: white;
+            border: none;
+            border-radius: 50%; /* Make it round */
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            margin-right: 0; /* Override default button margin */
+            margin-bottom: 0; /* Override default button margin */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #close-fullscreen-app-btn:hover {
+            background-color: #c0392b; /* Darker red on hover */
+            transform: scale(1.05);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            body {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto;
+            }
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                width: 100%;
+                box-shadow: 0 4px 15px var(--shadow-color);
+                flex-direction: row; /* Horizontal for small screens */
+                overflow-x: auto; /* Allow horizontal scroll for nav */
+                overflow-y: hidden;
+                padding: 15px 10px;
+                white-space: nowrap; /* Prevent button wrapping */
+            }
+            .sidebar nav ul {
+                display: flex;
+                flex-wrap: nowrap; /* Keep buttons in one line */
+                justify-content: center;
+                gap: 8px;
+            }
+            .sidebar nav ul li {
+                margin-bottom: 0;
+                flex-shrink: 0; /* Prevent buttons from shrinking */
+            }
+            .sidebar nav ul li button {
+                width: auto;
+                padding: 10px 15px;
+                font-size: 1rem;
+                transform: none !important; /* Override transform */
+            }
+            .sidebar nav ul li button:hover {
+                transform: none !important;
+            }
+            .sidebar nav ul li button i {
+                font-size: 1.2rem;
+            }
+            .main-content {
+                padding: 15px;
+            }
+            .tab-content {
+                padding: 25px;
+            }
+             .schedule-entry {
+                grid-template-columns: 1fr 1fr; /* Stack on smaller screens */
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            #greetings, #motivation-quote {
+                font-size: 1rem;
+            }
+            .time-display {
+                font-size: 2.5rem;
+            }
+            button, input, select, textarea {
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
+            .card {
+                padding: 18px;
+            }
+            h2 {
+                font-size: 1.8rem;
+            }
+            h3 {
+                font-size: 1.3rem;
+            }
+            .schedule-entry {
+                grid-template-columns: 1fr; /* Full stack */
+            }
+            #music-iframe-container {
+                max-width: 280px; /* Adjust for very small screens */
+                height: 498px; /* Maintain aspect ratio (280/375 * 667) */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dynamic Learning Hub</h1>
+        <div id="greetings"></div>
+        <div id="motivation-quote"></div>
+    </header>
+
+    <aside class="sidebar">
+        <nav>
+            <ul>
+                <li><button id="nav-login-btn" class="nav-btn"><i class="fas fa-sign-in-alt"></i> Login/Register</button></li>
+                <li><button id="nav-timer-btn" class="nav-btn"><i class="fas fa-hourglass-half"></i> Timer</button></li>
+                <li><button id="nav-schedule-btn" class="nav-btn"><i class="fas fa-calendar-alt"></i> Schedule</button></li>
+                <li><button id="nav-todo-btn" class="nav-btn"><i class="fas fa-tasks"></i> To-Do List</button></li>
+                <li><button id="nav-stats-btn" class="nav-btn"><i class="fas fa-chart-line"></i> Statistics</button></li>
+                <li><button id="nav-settings-btn" class="nav-btn"><i class="fas fa-cogs"></i> Settings</button></li>
+            </ul>
+        </nav>
+        <div style="margin-top: auto; padding-top: 25px;">
+            <button id="logout-btn" style="width: 100%;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+<section id="login-section" class="tab-content active">            <div class="card" style="max-width: 450px; margin: 0 auto; text-align: center;">
+                <h2>Welcome to Your Study Journey!</h2>
+                <form id="login-form">
+                    <h3>Login</h3>
+                    <input type="text" id="login-username" placeholder="Username" required autocomplete="username">
+                    <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
+                    <div style="text-align: left; margin-bottom: 15px;">
+                        <input type="checkbox" id="remember-me" style="width: auto; margin-right: 8px;">
+                        <label for="remember-me" style="font-size: 0.95rem;">Remember Me</label>
+                    </div>
+                    <button type="submit" style="width: 100%;">Login</button>
+                </form>
+                <hr style="border-color: var(--border-color); margin: 30px 0;">
+                <form id="register-form">
+                    <h3>New Here? Register Now!</h3>
+                    <input type="text" id="register-username" placeholder="Choose a Username" required>
+                    <input type="password" id="register-password" placeholder="Create a Password" required>
+                    <button type="submit" style="width: 100%;">Register</button>
+                </form>
+                <p style="margin-top: 25px; font-size: 0.95rem; color: rgba(51,51,51,0.7);">
+                    *Note: This demo uses local storage for accounts. Not suitable for real security.*
+                </p>
+            </div>
+        </section>
+
+        <section id="timer-section" class="tab-content">
+            <div class="card">
+                <h2>Study & Break Timer</h2>
+                <p style="font-size: 1.15rem;">Current Subject: <span id="current-subject-display" style="font-weight: bold; color: var(--primary-blue);">Not Set</span></p>
+                <p style="font-size: 1.05rem;">Scheduled Subject: <span id="scheduled-subject-display" style="font-weight: bold; color: var(--secondary-teal);">Loading...</span></p>
+                <p style="font-size: 1.05rem;">Recommended Subject: <span id="recommended-subject-display" style="font-weight: bold; color: var(--accent-yellow);">Analyzing...</span></p>
+
+
+                <div class="time-display" id="learning-timer-display">01:00:00</div>
+
+                <div class="time-display break-timer-display" id="break-timer-display" style="display: none;">10:00</div>
+
+                <select id="subject-selector">
+                    </select>
+                <div style="margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center;">
+                    <button id="start-learning-btn"><i class="fas fa-play"></i> Start Learning</button>
+                    <button id="pause-learning-btn" disabled><i class="fas fa-pause"></i> Pause Learning</button>
+                    <button id="reset-learning-btn"><i class="fas fa-redo"></i> Reset Timer</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Break Time Controls</h3>
+                <div style="margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center;">
+                    <button id="start-break-btn"><i class="fas fa-coffee"></i> Start Break</button>
+                    <button id="skip-break-btn"><i class="fas fa-forward"></i> Skip Break</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Daily Study Goal</h3>
+                <label for="daily-goal-input" style="display: block; margin-bottom: 10px; font-size: 1.05rem;">Set Daily Goal (hours):</label>
+                <input type="number" id="daily-goal-input" value="4" min="0" style="width: auto; display: inline-block; margin-bottom: 0;">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="daily-goal-progress"></div>
+                </div>
+                <p id="daily-goal-status"></p>
+            </div>
+
+            <div id="music-iframe-container" class="card">
+                <h3>Relax & Focus Music</h3>
+                <p style="font-size: 0.9rem; color: #666;">
+                    *Music will play here during learning sessions.*
+                </p>
+                <iframe id="music-iframe" src="about:blank" allow="autoplay; encrypted-media;"></iframe>
+            </div>
+        </section>
+
+        <section id="schedule-section" class="tab-content">
+            <div class="card">
+                <h2>Your Study Schedule</h2>
+                <p style="font-size: 1.05rem; margin-bottom: 25px; color: #555;">Plan your subjects for each day and time. The app will suggest your next study topic!</p>
+                <h3>Add New Schedule Entry</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
+                    <div style="flex: 1 1 120px;">
+                        <label for="schedule-day">Day:</label>
+                        <select id="schedule-day">
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1 1 120px;">
+                        <label for="schedule-time">Time (HH:MM):</label>
+                        <input type="time" id="schedule-time" value="09:00">
+                    </div>
+                     <div style="flex: 2 1 180px;">
+                        <label for="schedule-subject">Subject:</label>
+                        <input type="text" id="schedule-subject" placeholder="e.g., Pure Maths" list="subject-options">
+                        <datalist id="subject-options">
+                            </datalist>
+                    </div>
+                    <button id="add-schedule-btn" style="flex: 0 0 auto; margin-bottom: 18px;"><i class="fas fa-plus"></i> Add Entry</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Current Schedule</h3>
+                <ul id="schedule-list" class="to-do-list">
+                    </ul>
+            </div>
+             <div class="card">
+                <h3>Recommended Study Subject</h3>
+                <p id="suggested-subject-card-display" style="font-size: 1.2rem; font-weight: bold; color: var(--secondary-teal); text-align: center;">No recommendation yet. Start studying!</p>
+                <button id="apply-recommendation-btn" style="margin-top: 15px; width: 100%;"><i class="fas fa-check"></i> Study This Now</button>
+            </div>
+        </section>
+
+        <section id="todo-section" class="tab-content">
+            <div class="card">
+                <h2>Your Daily Tasks</h2>
+                <div style="display: flex; gap: 12px; margin-bottom: 25px;">
+                    <input type="text" id="new-todo-input" placeholder="Add a new task..." style="flex-grow: 1;">
+                    <button id="add-todo-btn"><i class="fas fa-plus"></i> Add Task</button>
+                </div>
+                <ul id="todo-list" class="to-do-list">
+                    </ul>
+                <button id="clear-completed-btn" style="margin-top: 25px;"><i class="fas fa-check-double"></i> Clear Completed</button>
+            </div>
+        </section>
+
+        <section id="stats-section" class="tab-content">
+            <div class="card subject-stats">
+                <h2>Your Study Insights</h2>
+                <h3>Time Spent Per Subject</h3>
+                <ul id="subject-times-list">
+                    </ul>
+                <p style="margin-top: 25px; font-size: 1.2rem; font-weight: bold; color: var(--primary-blue);">
+                    Total Study Time: <span id="total-study-time" style="color: var(--secondary-teal);">00:00:00</span>
+                </p>
+                <p style="font-size: 1.2rem; font-weight: bold; color: var(--dark-text);">
+                    Total Break Time: <span id="total-break-time" style="color: var(--accent-yellow);">00:00:00</span>
+                </p>
+                <h3>Study Time Distribution by Subject</h3>
+                <div id="subject-time-chart-container">
+                    <canvas id="subjectTimeChart"></canvas>
+                </div>
+                <h3>Daily Study Progress</h3>
+                <div id="daily-time-chart-container">
+                    <canvas id="dailyTimeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Log Custom Study Time</h3>
+                <label for="custom-subject-input" style="display: block; margin-bottom: 10px; font-size: 1.05rem;">Subject Name:</label>
+                <input type="text" id="custom-subject-input" placeholder="e.g., Biology" list="subject-options-all">
+                <datalist id="subject-options-all">
+                </datalist>
+                <label for="custom-time-minutes-input" style="display: block; margin-bottom: 10px; font-size: 1.05rem;">Time Spent (minutes):</label>
+                <input type="number" id="custom-time-minutes-input" placeholder="e.g., 60" min="1">
+                <button id="log-custom-time-btn"><i class="fas fa-clock"></i> Log Time</button>
+            </div>
+
+            <div class="card">
+                <h3>Time Spent on Apps</h3>
+                <ul id="app-usage-list" class="subject-stats">
+                </ul>
+            </div>
+        </section>
+
+        <section id="settings-section" class="tab-content">
+            <div class="card">
+                <h2>App Preferences</h2>
+                <label for="alarm-sound-select" style="display: block; margin-bottom: 10px; font-size: 1.05rem;">Alarm Sound:</label>
+                <select id="alarm-sound-select" style="margin-bottom: 20px;">
+                    <option value="Music/songs/music-2.mp3">Calm Chime (Default)</option>
+                    <option value="sounds/alarm1.mp3">Classic Bell</option>
+                    <option value="sounds/alarm2.mp3">Gentle Melody</option>
+                    <option value="sounds/alarm3.mp3">Digital Beep</option>
+                </select>
+                <button id="test-alarm-btn" style="margin-bottom: 25px;"><i class="fas fa-volume-up"></i> Test Alarm</button>
+
+                <div style="display: flex; align-items: center; margin-bottom: 20px; font-size: 1.05rem;">
+                    <label for="notification-toggle" style="flex-grow: 1;">Browser Notifications:</label>
+                    <input type="checkbox" id="notification-toggle" style="width: auto; margin-bottom: 0;">
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <label for="music-iframe-src" style="display: block; margin-bottom: 10px; font-size: 1.05rem;">Music Player URL (iframe):</label>
+                    <input type="text" id="music-iframe-src" value="file:///C:/Users/User/Downloads/Music/Infinity%20Music.html" readonly style="width: 100%; margin-bottom: 10px;">
+                    <button id="set-iframe-src-btn" disabled><i class="fas fa-music"></i> Set Music URL</button>
+                    <p style="font-size: 0.9rem; color: #666; margin-top: 5px;">*Music URL is constant as per your request.*</p>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 25px;">
+                <h3>Daily Study Streak</h3>
+                <p style="font-size: 1.15rem;">Current Streak: <span id="current-streak-display" style="font-weight: bold; color: var(--secondary-teal);">0 days</span></p>
+                <p style="font-size: 0.9rem; color: #666;">*Achieve your daily goal to increase your streak!*</p>
+            </div>
+
+            <div class="card" style="margin-top: 25px;">
+                <h3>Distraction Apps (Disabled during study)</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
+                    <button class="app-button" id="youtube-btn" data-app-name="youtube" data-url="youtube.com">
+                        <i class="fab fa-youtube"></i> YouTube
+                    </button>
+                    <button class="app-button" id="instagram-btn" data-app-name="instagram" data-url="https://www.instagram.com/">
+                        <i class="fab fa-instagram"></i> Instagram
+                    </button>
+                    <button class="app-button" id="tiktok-btn" data-app-name="tiktok" data-url="https://www.tiktok.com/">
+                        <i class="fab fa-tiktok"></i> TikTok
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© <span id="current-year"></span> Dynamic Learning Hub. Crafted with Focus & Flow.</p>
+    </footer>
+
+    <audio id="alarm-audio"></audio>
+
+    <div id="initial-setup-modal" class="modal">
+        <div class="modal-content">
+            <h3>Welcome to Dynamic Learning Hub!</h3>
+            <p>To help you get started, please set your daily study goal in hours:</p>
+            <input type="number" id="initial-daily-goal-input" placeholder="e.g., 4" value="4" min="0" required>
+            <button id="save-initial-goal-btn">Start My Journey!</button>
+        </div>
+    </div>
+
+    <div id="fullscreen-app-overlay">
+        <div id="iframe-controls">
+            <div id="iframe-timer-display">00:00:00</div>
+            <button id="close-fullscreen-app-btn">✖</button>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        // --- INTERNAL JAVASCRIPT ---
+
+        // DOM Elements
+        const loginSection = document.getElementById('login-section');
+        const appSections = document.querySelectorAll('.tab-content');
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const loginUsernameInput = document.getElementById('login-username');
+        const loginPasswordInput = document.getElementById('login-password');
+        const registerUsernameInput = document.getElementById('register-username');
+        const registerPasswordInput = document.getElementById('register-password');
+        const greetingsDisplay = document.getElementById('greetings');
+        const motivationQuoteDisplay = document.getElementById('motivation-quote');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        const learningTimerDisplay = document.getElementById('learning-timer-display');
+        const breakTimerDisplay = document.getElementById('break-timer-display');
+        const subjectSelector = document.getElementById('subject-selector');
+        const currentSubjectDisplay = document.getElementById('current-subject-display');
+        const scheduledSubjectDisplay = document.getElementById('scheduled-subject-display');
+        const recommendedSubjectDisplay = document.getElementById('recommended-subject-display');
+        const applyRecommendationBtn = document.getElementById('apply-recommendation-btn');
+        const suggestedSubjectCardDisplay = document.getElementById('suggested-subject-card-display');
+
+        const startLearningBtn = document.getElementById('start-learning-btn');
+        const pauseLearningBtn = document.getElementById('pause-learning-btn');
+        const resetLearningBtn = document.getElementById('reset-learning-btn');
+        const startBreakBtn = document.getElementById('start-break-btn');
+        const skipBreakBtn = document.getElementById('skip-break-btn');
+
+        const newTodoInput = document.getElementById('new-todo-input');
+        const addTodoBtn = document.getElementById('add-todo-btn');
+        const todoList = document.getElementById('todo-list');
+        const clearCompletedBtn = document.getElementById('clear-completed-btn');
+
+        const subjectTimesList = document.getElementById('subject-times-list');
+        const totalStudyTimeDisplay = document.getElementById('total-study-time');
+        const totalBreakTimeDisplay = document.getElementById('total-break-time');
+
+        const alarmSoundSelect = document.getElementById('alarm-sound-select');
+        const testAlarmBtn = document.getElementById('test-alarm-btn');
+        const notificationToggle = document.getElementById('notification-toggle');
+        const alarmAudio = document.getElementById('alarm-audio');
+        alarmAudio.volume = 0.7; // Set default volume
+
+        const dailyGoalInput = document.getElementById('daily-goal-input');
+        const dailyGoalProgress = document.getElementById('daily-goal-progress');
+        const dailyGoalStatus = document.getElementById('daily-goal-status');
+
+        const musicIframeContainer = document.getElementById('music-iframe-container');
+        const musicIframe = document.getElementById('music-iframe');
+        const musicIframeSrcInput = document.getElementById('music-iframe-src');
+        const setIframeSrcBtn = document.getElementById('set-iframe-src-btn'); // Still exists but disabled
+
+        const scheduleDaySelect = document.getElementById('schedule-day');
+        const scheduleTimeInput = document.getElementById('schedule-time');
+        const scheduleSubjectInput = document.getElementById('schedule-subject');
+        const addScheduleBtn = document.getElementById('add-schedule-btn');
+        const scheduleList = document.getElementById('schedule-list');
+
+        const initialSetupModal = document.getElementById('initial-setup-modal');
+        const initialDailyGoalInput = document.getElementById('initial-daily-goal-input');
+        const saveInitialGoalBtn = document.getElementById('save-initial-goal-btn');
+
+        const subjectTimeChartCanvas = document.getElementById('subjectTimeChart');
+        let subjectTimeChart; // Variable to hold the Chart.js instance
+
+        const dailyTimeChartCanvas = document.getElementById('dailyTimeChart'); // New: Daily Time Chart Canvas
+        let dailyTimeChart; // New: Daily Time Chart instance
+
+        const currentStreakDisplay = document.getElementById('current-streak-display');
+        const rememberMeCheckbox = document.getElementById('remember-me'); // New DOM element for remember me
+
+        // New DOM elements for Custom Time Logging
+        const customSubjectInput = document.getElementById('custom-subject-input');
+        const customTimeMinutesInput = document.getElementById('custom-time-minutes-input');
+        const logCustomTimeBtn = document.getElementById('log-custom-time-btn');
+        const subjectOptionsAllDatalist = document.getElementById('subject-options-all');
+
+        // New DOM elements for Fullscreen App Overlay
+        const fullscreenAppOverlay = document.getElementById('fullscreen-app-overlay');
+        const fullscreenAppIframe = document.getElementById('fullscreen-app-iframe'); // This iframe is now unused directly but still referenced
+        const iframeTimerDisplay = document.getElementById('iframe-timer-display');
+        const closeFullscreenAppBtn = document.getElementById('close-fullscreen-app-btn');
+
+        const appButtons = document.querySelectorAll('.app-button'); // Select all new app buttons
+
+        // New DOM elements for App Usage Statistics
+        const appUsageList = document.getElementById('app-usage-list');
+
+        // State Variables (User-specific data)
+        let learningTime = 3600; // 1 hour in seconds - Initial value for display
+        let breakTime = 600;    // 10 minutes in seconds - Initial value for display
+        let learningTimerInterval;
+        let breakTimerInterval;
+        let isLearningActive = false;
+        let isBreakActive = false;
+        let currentSubject = "Not Set";
+
+        // Local Storage Keys
+        const LOCAL_STORAGE_USERS_KEY = 'dynamicLearningHub.users';
+        const LOCAL_STORAGE_CURRENT_USER_KEY = 'dynamicLearningHub.currentUser';
+        const LOCAL_STORAGE_REMEMBERED_USERNAME_KEY = 'dynamicLearningHub.rememberedUsername';
+
+        let users = JSON.parse(localStorage.getItem(LOCAL_STORAGE_USERS_KEY)) || {};
+        let currentUser = localStorage.getItem(LOCAL_STORAGE_CURRENT_USER_KEY);
+
+        // Data Structure for User Data
+        const defaultUserData = {
+            dailyGoal: 4, // hours
+            totalStudySeconds: 0,
+            totalBreakSeconds: 0,
+            subjectStudyTimes: {}, // { "Math": 3600, "Science": 7200 }
+            dailyStudyLog: {}, // { "2023-10-26": 7200, "2023-10-27": 10800 } (seconds per day)
+            todos: [], // [{ id: 1, text: "Read Chapter 1", completed: false }]
+            schedule: [], // [{ id: 1, day: "Monday", time: "09:00", subject: "Math" }]
+            currentStreak: 0,
+            lastGoalCompletionDate: null,
+            appUsage: {}, // { "youtube": 3600 }
+            alarmSound: "Music/songs/music-2.mp3",
+            notificationsEnabled: false,
+        };
+
+        // Default Subjects for the selector and datalist - ONLY ALLOWED SUBJECTS
+        const defaultSubjects = ["Pure Maths", "Applied Maths", "Physics", "Chemistry"];
+
+        // Motivational Quotes
+        const motivationalQuotes = [
+            "The best way to predict the future is to create it.",
+            "Success is the sum of small efforts, repeated day in and day out.",
+            "The mind is not a vessel to be filled, but a fire to be kindled.",
+            "Don't wish for it, work for it.",
+            "The expert in anything was once a beginner.",
+            "Believe you can and you're halfway there.",
+            "The beautiful thing about learning is that no one can take it away from you."
+        ];
+
+        // Functions
+
+        function saveUserData() {
+            if (currentUser && users[currentUser]) {
+                localStorage.setItem(LOCAL_STORAGE_USERS_KEY, JSON.stringify(users));
+            }
+        }
+
+        function loadAllData() {
+            users = JSON.parse(localStorage.getItem(LOCAL_STORAGE_USERS_KEY)) || {};
+            currentUser = localStorage.getItem(LOCAL_STORAGE_CURRENT_USER_KEY);
+
+            // Ensure current user data is initialized with defaults if missing new fields
+            if (currentUser) { // Only attempt to merge if a currentUser exists
+                users[currentUser] = { ...defaultUserData, ...users[currentUser] };
+                saveUserData(); // Save after ensuring defaults are present
+            }
+        }
+
+        function showLoginSection() {
+            loginSection.classList.add('active');
+            appSections.forEach(section => {
+                if (section.id !== 'login-section') {
+                    section.classList.remove('active');
+                }
+            });
+            navButtons.forEach(button => button.classList.remove('active'));
+            document.getElementById('nav-login-btn').classList.add('active');
+            logoutBtn.style.display = 'none';
+        }
+
+        function showAppContent() {
+            loginSection.classList.remove('active');
+            showTab('timer-section'); // Default to timer section after login
+            logoutBtn.style.display = 'block';
+            updateAppButtonStates();
+            updateDailyGoalProgress();
+            loadSchedule();
+            loadTodos();
+            renderSubjectTimes();
+            renderAppUsage();
+            // Initialize timer displays when app content is shown
+            updateLearningTimerDisplay();
+            updateBreakTimerDisplay();
+        }
+
+        function setGreeting() {
+            const now = new Date();
+            const hours = now.getHours();
+            let greeting;
+
+            if (hours < 12) {
+                greeting = "Good Morning";
+                document.body.style.background = `linear-gradient(135deg, var(--bg-start-morning) 0%, var(--bg-end-morning) 100%)`;
+            } else if (hours < 18) {
+                greeting = "Good Afternoon";
+                document.body.style.background = `linear-gradient(135deg, var(--bg-start-afternoon) 0%, var(--bg-end-afternoon) 100%)`;
+            } else if (hours < 22) {
+                greeting = "Good Evening";
+                document.body.style.background = `linear-gradient(135deg, var(--bg-start-evening) 0%, var(--bg-end-evening) 100%)`;
+            } else {
+                greeting = "Good Night";
+                document.body.style.background = `linear-gradient(135deg, var(--bg-start-night) 0%, var(--bg-end-night) 100%)`;
+            }
+
+            greetingsDisplay.textContent = `${greeting}, ${currentUser}!`;
+            motivationQuoteDisplay.textContent = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+        }
+
+        function showTab(tabId) {
+            appSections.forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+
+            navButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            document.getElementById(`nav-${tabId.replace('-section', '')}-btn`).classList.add('active');
+
+            // Specific actions for timer section
+            if (tabId === 'timer-section') {
+                updateScheduledSubject();
+                updateRecommendedSubject();
+            }
+             if (tabId === 'stats-section') {
+                renderSubjectTimeChart();
+                renderDailyTimeChart(); // New: Render daily chart
+            }
+            if (tabId === 'settings-section') {
+                alarmSoundSelect.value = users[currentUser].alarmSound;
+                notificationToggle.checked = users[currentUser].notificationsEnabled;
+            }
+        }
+
+        function formatTime(seconds) {
+            const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+            const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+            const s = String(seconds % 60).padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        function formatBreakTime(seconds) {
+            const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const s = String(seconds % 60).padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function updateLearningTimerDisplay() {
+            learningTimerDisplay.textContent = formatTime(learningTime);
+        }
+
+        function updateBreakTimerDisplay() {
+            breakTimerDisplay.textContent = formatBreakTime(breakTime);
+        }
+
+        function getTodayDateString() {
+            return new Date().toISOString().slice(0, 10); //YYYY-MM-DD
+        }
+
+        function playAlarm() {
+            alarmAudio.src = users[currentUser].alarmSound;
+            alarmAudio.play();
+            setTimeout(() => { // Stop after 5 seconds to prevent continuous play
+                alarmAudio.pause();
+                alarmAudio.currentTime = 0;
+            }, 5000);
+        }
+
+        function sendNotification(title, body) {
+            if (users[currentUser].notificationsEnabled && Notification.permission === "granted") {
+                new Notification(title, { body });
+            }
+        }
+
+        function startLearningTimer() {
+            if (isLearningActive) return; // Prevent starting if already active
+
+            isLearningActive = true;
+            isBreakActive = false;
+
+            clearInterval(breakTimerInterval); // Ensure break timer is stopped
+            breakTimerDisplay.style.display = 'none';
+            learningTimerDisplay.style.display = 'block';
+
+            startLearningBtn.disabled = true;
+            pauseLearningBtn.disabled = false;
+            resetLearningBtn.disabled = true; // Disable reset while counting
+            startBreakBtn.disabled = true;
+            skipBreakBtn.disabled = true;
+
+            currentSubject = subjectSelector.value;
+            currentSubjectDisplay.textContent = currentSubject;
+            musicIframeContainer.classList.add('active');
+            musicIframe.src = musicIframeSrcInput.value; // Use the URL from the input
+
+            // Ensure learningTime is set to 1 hour (3600 seconds) when starting
+            if (learningTime <= 0 || learningTime === 3600) { // If it was 0 or already full, reset to full
+                learningTime = 3600;
+            }
+            updateLearningTimerDisplay(); // Update display immediately
+
+            learningTimerInterval = setInterval(() => {
+                learningTime--;
+                updateLearningTimerDisplay();
+                if (learningTime <= 0) {
+                    clearInterval(learningTimerInterval);
+                    isLearningActive = false;
+                    const studyDuration = 3600; // 1 hour for each completed session
+                    learningTime = 3600; // Reset for next session to full duration
+                    updateLearningTimerDisplay();
+                    playAlarm();
+                    sendNotification("Study Session Over!", "Time for a break or start a new session.");
+                    startLearningBtn.disabled = false; // Enable start learning again
+                    pauseLearningBtn.disabled = true;
+                    resetLearningBtn.disabled = false; // Allow reset after session completion
+                    startBreakBtn.disabled = false; // Enable break start after learning ends
+                    skipBreakBtn.disabled = false;
+                    musicIframeContainer.classList.remove('active');
+                    musicIframe.src = "about:blank"; // Stop music
+                    updateTotalStudyTime(studyDuration);
+                    updateSubjectStudyTime(currentSubject, studyDuration);
+                    updateDailyStudyLog(studyDuration);
+                    updateDailyGoalProgress();
+                    checkDailyGoalCompletion();
+                }
+            }, 1000);
+        }
+
+        function pauseLearningTimer() {
+            if (!isLearningActive) return; // Only pause if active
+
+            clearInterval(learningTimerInterval);
+            isLearningActive = false;
+            startLearningBtn.disabled = false;
+            pauseLearningBtn.disabled = true;
+            resetLearningBtn.disabled = false; // Allow reset while paused
+            startBreakBtn.disabled = false; // Allow starting break from pause
+            skipBreakBtn.disabled = false;
+            musicIframeContainer.classList.remove('active');
+            musicIframe.src = "about:blank"; // Stop music
+        }
+
+        function resetLearningTimer() {
+            clearInterval(learningTimerInterval);
+            clearInterval(breakTimerInterval); // Ensure both are cleared
+            isLearningActive = false;
+            isBreakActive = false;
+            learningTime = 3600; // Reset to 1 hour initial state
+            breakTime = 600; // Reset break time to 10 minutes initial state
+            updateLearningTimerDisplay();
+            updateBreakTimerDisplay();
+            learningTimerDisplay.style.display = 'block'; // Ensure learning timer is visible
+            breakTimerDisplay.style.display = 'none'; // Ensure break timer is hidden
+            startLearningBtn.disabled = false;
+            pauseLearningBtn.disabled = true;
+            resetLearningBtn.disabled = false; // Always enabled for full reset
+            startBreakBtn.disabled = false;
+            skipBreakBtn.disabled = false;
+            musicIframeContainer.classList.remove('active');
+            musicIframe.src = "about:blank"; // Stop music
+        }
+
+        function startBreakTimer() {
+            if (isBreakActive) return; // Prevent starting if already active
+
+            isBreakActive = true;
+            isLearningActive = false;
+
+            clearInterval(learningTimerInterval); // Ensure learning timer is stopped
+            learningTimerDisplay.style.display = 'none';
+            breakTimerDisplay.style.display = 'block';
+
+            startBreakBtn.disabled = true;
+            startLearningBtn.disabled = true; // Cannot start learning during break
+            pauseLearningBtn.disabled = true;
+            resetLearningBtn.disabled = true; // Cannot reset learning timer during break
+            skipBreakBtn.disabled = false;
+
+            // Ensure breakTime is set to 10 minutes (600 seconds) when starting
+            if (breakTime <= 0 || breakTime === 600) { // If it was 0 or already full, reset to full
+                breakTime = 600;
+            }
+            updateBreakTimerDisplay(); // Update display immediately
+
+            musicIframeContainer.classList.remove('active'); // Hide music player during break
+            musicIframe.src = "about:blank"; // Stop music
+
+            breakTimerInterval = setInterval(() => {
+                breakTime--;
+                updateBreakTimerDisplay();
+                if (breakTime <= 0) {
+                    clearInterval(breakTimerInterval);
+                    isBreakActive = false;
+                    const breakDuration = 600; // 10 minutes for each completed break
+                    breakTime = 600; // Reset for next break to full duration
+                    updateBreakTimerDisplay();
+                    playAlarm();
+                    sendNotification("Break Over!", "Time to get back to studying!");
+                    startLearningBtn.disabled = false; // Enable start learning after break ends
+                    startBreakBtn.disabled = false; // Re-enable for next break cycle
+                    resetLearningBtn.disabled = false; // Re-enable reset after break
+                    skipBreakBtn.disabled = true; // Disable skip as break is over
+                    updateTotalBreakTime(breakDuration);
+                }
+            }, 1000);
+        }
+
+        function skipBreak() {
+            if (!isBreakActive) return; // Only skip if break is active
+
+            clearInterval(breakTimerInterval);
+            isBreakActive = false;
+            // No updateTotalBreakTime here as the break was skipped, not completed.
+            breakTime = 600; // Reset break time to 10 minutes
+            updateBreakTimerDisplay(); // Update display to show reset time
+            startLearningBtn.disabled = false;
+            startBreakBtn.disabled = false;
+            resetLearningBtn.disabled = false; // Re-enable reset
+            skipBreakBtn.disabled = true;
+            musicIframeContainer.classList.remove('active');
+            musicIframe.src = "about:blank"; // Stop music
+        }
+
+
+        function updateTotalStudyTime(seconds) {
+            if (currentUser) {
+                users[currentUser].totalStudySeconds += seconds;
+                saveUserData();
+                renderTotalTimes();
+            }
+        }
+
+        function updateTotalBreakTime(seconds) {
+            if (currentUser) {
+                users[currentUser].totalBreakSeconds += seconds;
+                saveUserData();
+                renderTotalTimes();
+            }
+        }
+
+        function renderTotalTimes() {
+            if (currentUser && users[currentUser]) {
+                totalStudyTimeDisplay.textContent = formatTime(users[currentUser].totalStudySeconds);
+                totalBreakTimeDisplay.textContent = formatTime(users[currentUser].totalBreakSeconds);
+            } else {
+                totalStudyTimeDisplay.textContent = "00:00:00";
+                totalBreakTimeDisplay.textContent = "00:00:00";
+            }
+        }
+
+        function updateSubjectStudyTime(subject, seconds) {
+            if (currentUser) {
+                if (!users[currentUser].subjectStudyTimes[subject]) {
+                    users[currentUser].subjectStudyTimes[subject] = 0;
+                }
+                users[currentUser].subjectStudyTimes[subject] += seconds;
+                saveUserData();
+                renderSubjectTimes();
+                renderSubjectTimeChart();
+            }
+        }
+
+        // New: Function to log daily study time
+        function updateDailyStudyLog(seconds) {
+            if (currentUser) {
+                const today = getTodayDateString();
+                if (!users[currentUser].dailyStudyLog[today]) {
+                    users[currentUser].dailyStudyLog[today] = 0;
+                }
+                users[currentUser].dailyStudyLog[today] += seconds;
+                saveUserData();
+                renderDailyTimeChart();
+            }
+        }
+
+        function renderSubjectTimes() {
+            subjectTimesList.innerHTML = '';
+            if (currentUser && users[currentUser]) {
+                for (const subject in users[currentUser].subjectStudyTimes) {
+                    const time = users[currentUser].subjectStudyTimes[subject];
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${subject}:</span> <span>${formatTime(time)}</span>`;
+                    subjectTimesList.appendChild(li);
+                }
+            }
+        }
+
+        function updateAppButtonStates() {
+            if (currentUser) {
+                document.getElementById('nav-login-btn').style.display = 'none';
+                navButtons.forEach(button => {
+                    if (button.id !== 'nav-login-btn') {
+                        button.style.display = 'block';
+                    }
+                });
+                logoutBtn.style.display = 'block';
+            } else {
+                document.getElementById('nav-login-btn').style.display = 'block';
+                navButtons.forEach(button => {
+                    if (button.id !== 'nav-login-btn') {
+                        button.style.display = 'none';
+                    }
+                });
+                logoutBtn.style.display = 'none';
+            }
+        }
+
+        function loadSubjectSelector() {
+            subjectSelector.innerHTML = '';
+            // Always start with the explicitly allowed subjects for the selector
+            const allSubjects = new Set(defaultSubjects);
+
+            if (currentUser && users[currentUser]) {
+                // Add any subjects from user's data that are also in the defaultSubjects list
+                Object.keys(users[currentUser].subjectStudyTimes).forEach(subject => {
+                    if (defaultSubjects.includes(subject)) {
+                        allSubjects.add(subject);
+                    }
+                });
+                users[currentUser].todos.forEach(todo => {
+                    const match = todo.text.match(/^([^:]+):/);
+                    if (match && match[1] && defaultSubjects.includes(match[1].trim())) {
+                        allSubjects.add(match[1].trim());
+                    }
+                });
+                users[currentUser].schedule.forEach(entry => {
+                    if (defaultSubjects.includes(entry.subject)) {
+                        allSubjects.add(entry.subject);
+                    }
+                });
+            }
+
+            const sortedSubjects = Array.from(allSubjects).sort();
+
+            sortedSubjects.forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub;
+                option.textContent = sub;
+                subjectSelector.appendChild(option);
+
+                // For the datalist in custom time logging, also restrict to defaultSubjects
+                const datalistOption = document.createElement('option');
+                datalistOption.value = sub;
+                subjectOptionsAllDatalist.appendChild(datalistOption);
+            });
+            if (subjectSelector.options.length > 0) {
+                subjectSelector.value = subjectSelector.options[0].value; // Set default selected subject
+            }
+        }
+
+        function loadTodos() {
+            todoList.innerHTML = '';
+            if (currentUser && users[currentUser]) {
+                users[currentUser].todos.forEach(todo => {
+                    addTodoElement(todo);
+                });
+            }
+        }
+
+        function addTodoElement(todo) {
+            const li = document.createElement('li');
+            li.className = `to-do-item ${todo.completed ? 'completed' : ''}`;
+            li.dataset.id = todo.id;
+            li.innerHTML = `
+                <span contenteditable="${!todo.completed}" onblur="editTodoText(${todo.id}, this.textContent)">${todo.text}</span>
+                <div class="actions">
+                    <button onclick="toggleTodoCompleted(${todo.id})" title="${todo.completed ? 'Mark Incomplete' : 'Mark Complete'}">
+                        <i class="fas fa-check-square"></i>
+                    </button>
+                    <button onclick="deleteTodo(${todo.id})" title="Delete Task">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            todoList.appendChild(li);
+        }
+
+        function saveTodos() {
+            if (currentUser) {
+                // Read current state from DOM and update users[currentUser].todos
+                const currentTodos = [];
+                document.querySelectorAll('.to-do-item').forEach(li => {
+                    currentTodos.push({
+                        id: parseInt(li.dataset.id),
+                        text: li.querySelector('span').textContent,
+                        completed: li.classList.contains('completed')
+                    });
+                });
+                users[currentUser].todos = currentTodos;
+                saveUserData();
+            }
+        }
+
+        function addTodo() {
+            const text = newTodoInput.value.trim();
+            if (text && currentUser) {
+                const newId = users[currentUser].todos.length > 0 ? Math.max(...users[currentUser].todos.map(t => t.id)) + 1 : 1;
+                const newTodo = { id: newId, text: text, completed: false };
+                users[currentUser].todos.push(newTodo);
+                addTodoElement(newTodo);
+                saveUserData();
+                newTodoInput.value = '';
+            }
+        }
+
+        function toggleTodoCompleted(id) {
+            const todoItem = document.querySelector(`.to-do-item[data-id='${id}']`);
+            if (todoItem) {
+                const todoInArray = users[currentUser].todos.find(t => t.id === id);
+                if (todoInArray) {
+                    todoInArray.completed = !todoInArray.completed;
+                    todoItem.classList.toggle('completed', todoInArray.completed);
+                    todoItem.querySelector('span').contentEditable = !todoInArray.completed; // Make uneditable if completed
+                    saveUserData();
+                }
+            }
+        }
+
+        function deleteTodo(id) {
+            users[currentUser].todos = users[currentUser].todos.filter(todo => todo.id !== id);
+            document.querySelector(`.to-do-item[data-id='${id}']`).remove();
+            saveUserData();
+        }
+
+        function clearCompletedTodos() {
+            users[currentUser].todos = users[currentUser].todos.filter(todo => !todo.completed);
+            loadTodos(); // Re-render the list
+            saveUserData();
+        }
+
+        function renderSubjectTimeChart() {
+            if (subjectTimeChart) {
+                subjectTimeChart.destroy(); // Destroy previous chart instance
+            }
+
+            const ctx = subjectTimeChartCanvas.getContext('2d');
+            const subjectLabels = Object.keys(users[currentUser].subjectStudyTimes);
+            const studyData = Object.values(users[currentUser].subjectStudyTimes).map(seconds => (seconds / 3600).toFixed(1)); // Convert to hours
+
+            const backgroundColors = [
+                'rgba(77, 168, 218, 0.8)',   // Primary Blue
+                'rgba(128, 216, 195, 0.8)',  // Secondary Teal
+                'rgba(255, 214, 107, 0.8)',  // Accent Yellow
+                'rgba(44, 62, 80, 0.8)'      // Dark Blue (for fourth subject)
+            ];
+            const borderColors = [
+                'rgba(77, 168, 218, 1)',
+                'rgba(128, 216, 195, 1)',
+                'rgba(255, 214, 107, 1)',
+                'rgba(44, 62, 80, 1)'
+            ];
+
+            subjectTimeChart = new Chart(ctx, {
+                type: 'pie', // Changed to pie chart
+                data: {
+                    labels: subjectLabels,
+                    datasets: [{
+                        label: 'Hours Studied',
+                        data: studyData,
+                        backgroundColor: backgroundColors.slice(0, subjectLabels.length), // Use colors based on number of subjects
+                        borderColor: borderColors.slice(0, subjectLabels.length),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right', // Position legend to the right for pie chart
+                            labels: {
+                                font: {
+                                    size: 14,
+                                    family: 'Open Sans'
+                                },
+                                // Correctly get CSS variable
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--dark-text').trim()
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Study Time by Subject',
+                            font: {
+                                size: 18,
+                                family: 'Poppins'
+                            },
+                            // Correctly get CSS variable
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--primary-blue').trim()
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + ' hours';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderDailyTimeChart() {
+            if (dailyTimeChart) {
+                dailyTimeChart.destroy(); // Destroy previous chart instance
+            }
+
+            const ctx = dailyTimeChartCanvas.getContext('2d');
+            const dailyLogs = users[currentUser].dailyStudyLog;
+
+            // Sort dates to ensure chronological order
+            const sortedDates = Object.keys(dailyLogs).sort();
+            const dailyHours = sortedDates.map(date => (dailyLogs[date] / 3600).toFixed(1)); // Convert to hours
+
+            dailyTimeChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: sortedDates,
+                    datasets: [{
+                        label: 'Hours Studied Daily',
+                        data: dailyHours,
+                        backgroundColor: 'rgba(77, 168, 218, 0.4)', // Light primary blue
+                        borderColor: 'rgba(77, 168, 218, 1)',       // Primary blue
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3 // Smooth line
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Hours'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Daily Study Progress',
+                            font: {
+                                size: 18,
+                                family: 'Poppins'
+                            },
+                            // Correctly get CSS variable
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--primary-blue').trim()
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y + ' hours';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateDailyGoalProgress() {
+            if (!currentUser || !users[currentUser]) return;
+
+            const today = getTodayDateString();
+            const totalStudyHoursToday = (users[currentUser].dailyStudyLog[today] || 0) / 3600; // Get today's study hours
+            const dailyGoalHours = users[currentUser].dailyGoal;
+            const progressPercentage = (totalStudyHoursToday / dailyGoalHours) * 100;
+
+            dailyGoalProgress.style.setProperty('--progress-width', `${Math.min(progressPercentage, 100)}%`);
+
+            let statusText = `You've studied ${totalStudyHoursToday.toFixed(1)} of your ${dailyGoalHours} hour daily goal today.`;
+            if (totalStudyHoursToday >= dailyGoalHours) {
+                statusText += " Great job! Goal achieved!";
+                dailyGoalProgress.style.background = `linear-gradient(90deg, var(--accent-yellow) 0%, #FFCC00 100%)`; // Change color on goal achievement
+            } else {
+                dailyGoalProgress.style.background = `linear-gradient(90deg, var(--secondary-teal) 0%, var(--accent-yellow) 100%)`; // Reset color
+            }
+            dailyGoalStatus.textContent = statusText;
+        }
+
+        function checkDailyGoalCompletion() {
+            if (!currentUser || !users[currentUser]) return;
+
+            const today = getTodayDateString();
+            const totalStudyHoursToday = (users[currentUser].dailyStudyLog[today] || 0) / 3600;
+            const dailyGoalHours = users[currentUser].dailyGoal;
+
+            if (totalStudyHoursToday >= dailyGoalHours) {
+                if (users[currentUser].lastGoalCompletionDate !== today) {
+                    // Goal achieved for the first time today
+                    users[currentUser].currentStreak = (users[currentUser].currentStreak || 0) + 1;
+                    users[currentUser].lastGoalCompletionDate = today;
+                    saveUserData();
+                    updateStreakDisplay();
+                    triggerConfetti();
+                    sendNotification("Daily Goal Achieved!", `You've reached your ${dailyGoalHours} hour goal! Streak: ${users[currentUser].currentStreak} days!`);
+                }
+            } else {
+                // If the day changes and goal wasn't met for yesterday, reset streak
+                const lastCompletionDate = users[currentUser].lastGoalCompletionDate;
+                if (lastCompletionDate) {
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    const yesterdayString = yesterday.toISOString().slice(0, 10);
+
+                    if (lastCompletionDate !== today && lastCompletionDate !== yesterdayString) {
+                        users[currentUser].currentStreak = 0;
+                        saveUserData();
+                        updateStreakDisplay();
+                    }
+                }
+            }
+        }
+
+        function updateStreakDisplay() {
+            if (currentUser && users[currentUser]) {
+                currentStreakDisplay.textContent = `${users[currentUser].currentStreak} days`;
+            }
+        }
+
+        function triggerConfetti() {
+            const jsConfetti = new JSConfetti();
+            jsConfetti.addConfetti({
+                emojis: ['⚡️', '📚', '✨', '🧠', '💡'],
+                confettiRadius: 6,
+                confettiNumber: 200,
+            });
+        }
+
+        // Schedule Functions
+        function loadSchedule() {
+            scheduleList.innerHTML = '';
+            if (currentUser && users[currentUser]) {
+                // Sort schedule entries by day and then by time
+                const sortedSchedule = [...users[currentUser].schedule].sort((a, b) => {
+                    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                    const dayA = days.indexOf(a.day);
+                    const dayB = days.indexOf(b.day);
+                    if (dayA !== dayB) {
+                        return dayA - dayB;
+                    }
+                    return a.time.localeCompare(b.time);
+                });
+
+                sortedSchedule.forEach(entry => {
+                    addScheduleElement(entry);
+                });
+            }
+        }
+
+        function addScheduleElement(entry) {
+            const li = document.createElement('li');
+            li.className = 'schedule-entry';
+            li.dataset.id = entry.id;
+            li.innerHTML = `
+                <span>${entry.day}</span>
+                <span>${entry.time}</span>
+                <span>${entry.subject}</span>
+                <div class="actions">
+                    <button onclick="deleteScheduleEntry(${entry.id})" title="Delete Schedule Entry">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            scheduleList.appendChild(li);
+        }
+
+        function addScheduleEntry() {
+            const day = scheduleDaySelect.value;
+            const time = scheduleTimeInput.value;
+            const subject = scheduleSubjectInput.value.trim();
+
+            // Validate if the subject is one of the allowed subjects
+            if (!defaultSubjects.includes(subject)) {
+                alert(`Subject "${subject}" is not allowed. Please choose from: ${defaultSubjects.join(', ')}.`);
+                return;
+            }
+
+            if (subject && currentUser) {
+                const newId = users[currentUser].schedule.length > 0 ? Math.max(...users[currentUser].schedule.map(e => e.id)) + 1 : 1;
+                const newEntry = { id: newId, day, time, subject };
+                users[currentUser].schedule.push(newEntry);
+                saveUserData();
+                loadSchedule(); // Re-render to ensure sorting
+                scheduleSubjectInput.value = '';
+                updateScheduledSubject();
+                updateRecommendedSubject();
+                loadSubjectSelector(); // Update subject selector with new subject if applicable
+            } else {
+                alert("Please enter a subject for the schedule entry.");
+            }
+        }
+
+        function deleteScheduleEntry(id) {
+            users[currentUser].schedule = users[currentUser].schedule.filter(entry => entry.id !== id);
+            saveUserData();
+            loadSchedule(); // Re-render
+            updateScheduledSubject();
+            updateRecommendedSubject();
+        }
+
+        function updateScheduledSubject() {
+            if (!currentUser || !users[currentUser]) {
+                scheduledSubjectDisplay.textContent = "Please log in.";
+                return;
+            }
+
+            const now = new Date();
+            const currentDay = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][now.getDay()];
+            const currentTime = now.toTimeString().slice(0, 5); // HH:MM
+
+            // Find next scheduled subject
+            let nextScheduled = null;
+            let minDiffMinutes = Infinity;
+
+            users[currentUser].schedule.forEach(entry => {
+                // Check for today's schedule first
+                if (entry.day === currentDay) {
+                    const entryTime = entry.time; // HH:MM
+                    const [entryHour, entryMinute] = entryTime.split(':').map(Number);
+                    const [currentHour, currentMinute] = currentTime.split(':').map(Number);
+
+                    const entryTotalMinutes = entryHour * 60 + entryMinute;
+                    const currentTotalMinutes = currentHour * 60 + currentMinute;
+
+                    let diffMinutes = entryTotalMinutes - currentTotalMinutes;
+
+                    if (diffMinutes > 0 && diffMinutes < minDiffMinutes) {
+                        minDiffMinutes = diffMinutes;
+                        nextScheduled = entry;
+                    }
+                }
+            });
+
+            if (nextScheduled) {
+                scheduledSubjectDisplay.textContent = `${nextScheduled.subject} (Today at ${nextScheduled.time})`;
+            } else {
+                // If no more today, look for the next available day
+                const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                const currentDayIndex = now.getDay();
+
+                for (let i = 0; i < 7; i++) {
+                    const checkDayIndex = (currentDayIndex + i) % 7;
+                    const checkDay = daysOfWeek[checkDayIndex];
+
+                    const dailyEntries = users[currentUser].schedule.filter(entry => entry.day === checkDay)
+                                                            .sort((a, b) => a.time.localeCompare(b.time));
+
+                    for (const entry of dailyEntries) {
+                        if (checkDay === currentDay) {
+                             // Already handled "today" by finding entries after current time.
+                             // Now ensure we only consider entries *after* current time for the next day.
+                            const [entryHour, entryMinute] = entry.time.split(':').map(Number);
+                            const [currentHour, currentMinute] = currentTime.split(':').map(Number);
+
+                            if (entryHour * 60 + entryMinute > currentHour * 60 + currentMinute) {
+                                nextScheduled = entry;
+                                break; // Found the very next entry for today
+                            }
+                        } else {
+                            nextScheduled = entry;
+                            break; // Found the first entry for a future day
+                        }
+                    }
+                    if (nextScheduled) {
+                        scheduledSubjectDisplay.textContent = `${nextScheduled.subject} (${checkDay} at ${nextScheduled.time})`;
+                        break;
+                    }
+                }
+
+                if (!nextScheduled) {
+                    scheduledSubjectDisplay.textContent = "No upcoming scheduled subjects.";
+                }
+            }
+        }
+
+        function updateRecommendedSubject() {
+            if (!currentUser || !users[currentUser]) {
+                recommendedSubjectDisplay.textContent = "Please log in.";
+                suggestedSubjectCardDisplay.textContent = "Log in to get recommendations!";
+                applyRecommendationBtn.disabled = true;
+                return;
+            }
+            applyRecommendationBtn.disabled = false;
+
+            const subjectTimes = users[currentUser].subjectStudyTimes;
+            let leastStudiedSubject = null;
+            let minTime = Infinity;
+            let totalSubjectsRecorded = 0;
+
+            // Filter out subjects that are not in the allowed list for calculation
+            const relevantSubjectTimes = {};
+            for (const subject in subjectTimes) {
+                if (defaultSubjects.includes(subject)) {
+                    relevantSubjectTimes[subject] = subjectTimes[subject];
+                    totalSubjectsRecorded++;
+                }
+            }
+
+            for (const subject in relevantSubjectTimes) {
+                if (relevantSubjectTimes[subject] < minTime) {
+                    minTime = relevantSubjectTimes[subject];
+                    leastStudiedSubject = subject;
+                }
+            }
+
+            // Also consider allowed subjects that haven't been studied at all
+            let unstudiedAllowedSubjects = defaultSubjects.filter(sub => !(sub in relevantSubjectTimes));
+
+            if (unstudiedAllowedSubjects.length > 0) {
+                // If there are unstudied allowed subjects, prioritize them
+                leastStudiedSubject = unstudiedAllowedSubjects[0]; // Just pick the first one
+                recommendedSubjectDisplay.textContent = `${leastStudiedSubject} (Not yet studied)`;
+                suggestedSubjectCardDisplay.textContent = `You haven't studied ${leastStudiedSubject} yet!`;
+            } else if (totalSubjectsRecorded > 0 && leastStudiedSubject) {
+                recommendedSubjectDisplay.textContent = `${leastStudiedSubject} (Least studied)`;
+                suggestedSubjectCardDisplay.textContent = `You might want to focus on ${leastStudiedSubject}.`;
+            } else {
+                // If no subjects have been studied yet and no unstudied allowed subjects (shouldn't happen with defaultSubjects)
+                // Fallback to recommending the first default subject
+                leastStudiedSubject = defaultSubjects[0];
+                recommendedSubjectDisplay.textContent = `${leastStudiedSubject} (New to study)`;
+                suggestedSubjectCardDisplay.textContent = `How about starting with ${leastStudiedSubject}?`;
+            }
+        }
+
+        function applyRecommendedSubject() {
+            const recommended = recommendedSubjectDisplay.textContent.split('(')[0].trim();
+            if (recommended && recommended !== "No specific recommendation yet." && recommended !== "Start studying to get recommendations!") {
+                subjectSelector.value = recommended;
+                currentSubject = recommended;
+                currentSubjectDisplay.textContent = currentSubject;
+            }
+        }
+
+        function showInitialSetupModal() {
+            // Check if there are no registered users *and* no current user
+            if (!currentUser && Object.keys(users).length === 0) {
+                initialSetupModal.style.display = 'flex';
+            }
+        }
+
+        function saveInitialGoal() {
+            const goal = parseInt(initialDailyGoalInput.value);
+            if (!isNaN(goal) && goal >= 0) {
+                if (currentUser) {
+                    users[currentUser].dailyGoal = goal;
+                    saveUserData();
+                    updateDailyGoalProgress();
+                }
+                initialSetupModal.style.display = 'none';
+            } else {
+                alert("Please enter a valid number for your daily goal.");
+            }
+        }
+
+        function editTodoText(id, newText) {
+            const todoInArray = users[currentUser].todos.find(t => t.id === id);
+            if (todoInArray) {
+                todoInArray.text = newText;
+                saveUserData();
+            }
+        }
+
+        // Custom Time Logging
+        function logCustomTime() {
+            const subject = customSubjectInput.value.trim();
+            const minutes = parseInt(customTimeMinutesInput.value);
+
+            // Validate if the subject is one of the allowed subjects
+            if (!defaultSubjects.includes(subject)) {
+                alert(`Subject "${subject}" is not allowed. Please choose from: ${defaultSubjects.join(', ')}.`);
+                return;
+            }
+
+            if (subject && !isNaN(minutes) && minutes > 0) {
+                const seconds = minutes * 60;
+                updateTotalStudyTime(seconds);
+                updateSubjectStudyTime(subject, seconds);
+                updateDailyStudyLog(seconds); // New: Log daily study time for custom entries
+                customSubjectInput.value = '';
+                customTimeMinutesInput.value = '';
+                alert(`Logged ${minutes} minutes for ${subject}.`);
+            } else {
+                alert("Please enter a valid subject and positive minutes.");
+            }
+        }
+
+        // Music Player & Fullscreen App (Distraction Manager)
+        function toggleFullscreenApp(appName, url) {
+            if (!isLearningActive) { // Only allow if not in learning mode
+                // Note: The provided YouTube URL is an example and might not work due to embedding restrictions.
+                // You'd typically need a valid YouTube embed URL or similar for a music player.
+                // For demonstration, it's fine, but in a real app, external content embedding can be complex.
+                fullscreenAppIframe.src = url;
+                fullscreenAppOverlay.style.display = 'flex';
+                // Here you would likely start a separate timer for app usage
+                // For simplicity, we just display the app
+            } else {
+                alert("Please pause or end your learning session before using distraction apps.");
+            }
+        }
+
+        function closeFullscreenApp() {
+            fullscreenAppOverlay.style.display = 'none';
+            fullscreenAppIframe.src = "about:blank"; // Stop any media
+        }
+
+        function updateAppUsage(appName, seconds) {
+            if (currentUser) {
+                if (!users[currentUser].appUsage[appName]) {
+                    users[currentUser].appUsage[appName] = 0;
+                }
+                users[currentUser].appUsage[appName] += seconds;
+                saveUserData();
+                renderAppUsage();
+            }
+        }
+
+        function renderAppUsage() {
+            appUsageList.innerHTML = '';
+            if (currentUser && users[currentUser]) {
+                for (const app in users[currentUser].appUsage) {
+                    const time = users[currentUser].appUsage[app];
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${app}:</span> <span>${formatTime(time)}</span>`;
+                    appUsageList.appendChild(li);
+                }
+            }
+        }
+
+        // Event Listeners
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = loginUsernameInput.value;
+            const password = loginPasswordInput.value;
+
+            if (users[username] && users[username].password === password) {
+                currentUser = username;
+                localStorage.setItem(LOCAL_STORAGE_CURRENT_USER_KEY, currentUser);
+                if (rememberMeCheckbox.checked) {
+                    localStorage.setItem(LOCAL_STORAGE_REMEMBERED_USERNAME_KEY, username);
+                } else {
+                    localStorage.removeItem(LOCAL_STORAGE_REMEMBERED_USERNAME_KEY);
+                }
+                // Ensure user data is up-to-date with default fields after login
+                users[currentUser] = { ...defaultUserData, ...users[currentUser] };
+                saveUserData(); // Save merged data back
+
+                showAppContent();
+                setGreeting();
+                loadSubjectSelector();
+                renderTotalTimes();
+                updateStreakDisplay();
+                updateDailyGoalProgress();
+            } else {
+                alert("Invalid username or password.");
+            }
+        });
+
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = registerUsernameInput.value;
+            const password = registerPasswordInput.value;
+
+            if (users[username]) {
+                alert("Username already exists. Please choose a different one.");
+            } else {
+                users[username] = { ...defaultUserData, password: password };
+                saveUserData();
+                alert("Registration successful! You can now log in.");
+                registerUsernameInput.value = '';
+                registerPasswordInput.value = '';
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            currentUser = null;
+            localStorage.removeItem(LOCAL_STORAGE_CURRENT_USER_KEY);
+            localStorage.removeItem(LOCAL_STORAGE_REMEMBERED_USERNAME_KEY); // Clear remembered username on explicit logout
+            showLoginSection();
+            // Reset timers on logout
+            resetLearningTimer(); // Use the dedicated reset function
+        });
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.id.replace('nav-', '').replace('-btn', '-section');
+                showTab(tabId);
+            });
+        });
+
+        startLearningBtn.addEventListener('click', startLearningTimer);
+        pauseLearningBtn.addEventListener('click', pauseLearningTimer);
+        resetLearningBtn.addEventListener('click', resetLearningTimer);
+        startBreakBtn.addEventListener('click', startBreakTimer);
+        skipBreakBtn.addEventListener('click', skipBreak);
+
+        addTodoBtn.addEventListener('click', addTodo);
+        newTodoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+        clearCompletedBtn.addEventListener('click', clearCompletedTodos);
+
+        dailyGoalInput.addEventListener('change', () => {
+            if (currentUser) {
+                const newGoal = parseInt(dailyGoalInput.value);
+                if (!isNaN(newGoal) && newGoal >= 0) {
+                    users[currentUser].dailyGoal = newGoal;
+                    saveUserData();
+                    updateDailyGoalProgress();
+                } else {
+                    alert("Please enter a valid number for your daily goal.");
+                    dailyGoalInput.value = users[currentUser].dailyGoal; // Revert to old value
+                }
+            }
+        });
+
+        // Alarm sound selection
+        alarmSoundSelect.addEventListener('change', () => {
+            if (currentUser) {
+                users[currentUser].alarmSound = alarmSoundSelect.value;
+                saveUserData();
+            }
+        });
+
+        testAlarmBtn.addEventListener('click', playAlarm);
+
+        // Notification permission
+        notificationToggle.addEventListener('change', () => {
+            if (currentUser) {
+                users[currentUser].notificationsEnabled = notificationToggle.checked;
+                saveUserData();
+                if (notificationToggle.checked) {
+                    if (Notification.permission === "default") {
+                        Notification.requestPermission().then(permission => {
+                            if (permission === "granted") {
+                                sendNotification("Notifications Enabled!", "You will receive alerts from Dynamic Learning Hub.");
+                            } else {
+                                notificationToggle.checked = false; // Revert if not granted
+                                users[currentUser].notificationsEnabled = false;
+                                saveUserData();
+                            }
+                        });
+                    } else if (Notification.permission === "granted") {
+                        sendNotification("Notifications Enabled!", "You will receive alerts from Dynamic Learning Hub.");
+                    } else {
+                        alert("Notifications are blocked. Please enable them in your browser settings.");
+                        notificationToggle.checked = false; // Revert if blocked
+                        users[currentUser].notificationsEnabled = false;
+                        saveUserData();
+                    }
+                }
+            }
+        });
+
+        // Set music iframe URL - keeping this disabled as per original request
+        setIframeSrcBtn.addEventListener('click', () => {
+            // This button remains disabled and its functionality is not needed as per request.
+        });
+
+
+        addScheduleBtn.addEventListener('click', addScheduleEntry);
+
+        applyRecommendationBtn.addEventListener('click', applyRecommendedSubject);
+
+        saveInitialGoalBtn.addEventListener('click', saveInitialGoal);
+        initialDailyGoalInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                saveInitialGoal();
+            }
+        });
+
+        logCustomTimeBtn.addEventListener('click', logCustomTime);
+
+        // Distraction App Buttons
+        appButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const appName = button.dataset.appName;
+                const url = button.dataset.url;
+                toggleFullscreenApp(appName, url);
+            });
+        });
+
+        closeFullscreenAppBtn.addEventListener('click', closeFullscreenApp);
+
+        // Initial Load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+
+            loadAllData(); // Load all user data, including current user's specific data
+
+            // Autofill remembered username
+            const rememberedUsername = localStorage.getItem(LOCAL_STORAGE_REMEMBERED_USERNAME_KEY);
+            if (rememberedUsername) {
+                loginUsernameInput.value = rememberedUsername;
+                rememberMeCheckbox.checked = true; // Check the box if remembered
+            }
+
+            if (currentUser) {
+                // If a user is already logged in (remembered), then proceed to app content
+                showAppContent();
+                setGreeting();
+                showTab('timer-section'); // Show timer section by default
+            } else {
+                // If no user is logged in
+                showLoginSection();
+                // If there are no registered users at all, show the initial setup modal
+                if (Object.keys(users).length === 0) {
+                    setTimeout(showInitialSetupModal, 500); // Show modal after a slight delay
+                }
+            }
+            updateAppButtonStates(); // Set initial state of app buttons
+            loadSubjectSelector(); // Load subjects regardless of login status for datalists
+        });
+    </script>
+</body>
+</html>
