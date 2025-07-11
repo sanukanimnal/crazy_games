@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Friendship Dare Quiz</title>
+    <!-- Link to Google Fonts for 'Inter' font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+        <link rel="icon" type="image/x-icon" href="infinity.png">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Define CSS Variables for the new color palette */
+        :root {
+            --primary-color: #E14434; /* Strong Red - for main buttons, important headings, accents, correct answers */
+            --secondary-color: #5EABD6; /* Light Blue - for secondary buttons, borders, hover effects, question text */
+            --text-color-light: #FEFBC7; /* Cream - for main body text, input text */
+            --text-color-muted: rgba(254, 251, 199, 0.7); /* Muted Cream - for labels, subheadings */
+            --background-dark: #1a1a2e; /* Existing dark blue */
+            --background-medium: #0f3460; /* Existing slightly lighter dark blue for containers */
+            --background-light: #16213e; /* Existing darker blue for quiz sections/question items */
+            --input-bg: #2c324a; /* Existing dark input background */
+            --input-border: #3e445b; /* Existing input border */
+            --error-color: #FFB4B4; /* Light Red/Pink - for error messages, delete buttons */
+        }
+
+        /* General Body Styles */
+        body {
+            font-family: 'Inter', sans-serif; /* Apply Inter font */
+            background-color: var(--background-dark); /* Dark background color */
+            color: var(--text-color-light); /* Light text color */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column; /* Stack content and footer vertically */
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Align content to the top */
+            min-height: 100vh; /* Full viewport height */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+            background-image: linear-gradient(135deg, var(--background-dark) 0%, var(--background-light) 100%); /* Subtle gradient background */
+        }
+
+        /* Container for the form */
+        .container {
+            background-color: var(--background-medium); /* Slightly lighter dark blue for the container */
+            padding: 30px;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); /* Deep shadow for depth */
+            width: 100%;
+            max-width: 700px; /* Max width for readability on larger screens */
+            box-sizing: border-box;
+            animation: fadeIn 0.8s ease-out; /* Fade-in animation on load */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+            margin-bottom: 20px; /* Space before footer */
+        }
+
+        /* Keyframe animation for fade-in effect */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color); /* Accent color for headings */
+            margin-bottom: 30px;
+            font-weight: 700; /* Bold font weight */
+            letter-spacing: 1px; /* Spacing between letters */
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Text shadow for pop */
+        }
+
+        /* Form Group Styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block; /* Make label a block element */
+            margin-bottom: 8px;
+            font-weight: 600; /* Semi-bold label text */
+            color: var(--text-color-muted); /* Slightly muted text color for labels */
+        }
+
+        input[type="text"],
+        textarea {
+            width: calc(100% - 20px); /* Full width minus padding */
+            padding: 12px;
+            border: 1px solid var(--input-border); /* Border color */
+            border-radius: 8px; /* Rounded input fields */
+            background-color: var(--input-bg); /* Darker background for inputs */
+            color: var(--text-color-light); /* Light text color for input */
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for focus */
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: var(--primary-color); /* Accent color border on focus */
+            box-shadow: 0 0 0 3px rgba(225, 68, 52, 0.3); /* Glow effect on focus */
+            outline: none; /* Remove default outline */
+        }
+
+        /* Question Container Styling */
+        #questions-container .question-item {
+            background-color: var(--background-light); /* Darker blue for individual question items */
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative; /* Needed for positioning remove button */
+            animation: slideIn 0.5s ease-out; /* Slide-in animation for new questions */
+        }
+
+        /* Keyframe animation for slide-in effect */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .question-item .form-group {
+            margin-bottom: 15px; /* Spacing within question items */
+        }
+
+        .question-item .form-group:last-child {
+            margin-bottom: 0; /* No margin for the last form group in a question */
+        }
+
+        /* Multi-choice Answers Styling */
+        .answers-group {
+            margin-top: 15px;
+            padding-left: 10px;
+            border-left: 3px solid var(--primary-color); /* Accent border for answers group */
+        }
+
+        .answers-group > label {
+            font-weight: 600;
+            color: var(--text-color-muted);
+            margin-bottom: 10px;
+        }
+
+        .answer-option {
+            display: flex; /* Use flexbox for radio button and input alignment */
+            align-items: center; /* Vertically align items */
+            margin-bottom: 10px;
+        }
+
+        .answer-option input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+            width: 20px; /* Larger radio button */
+            height: 20px; /* Larger radio button */
+            accent-color: var(--secondary-color); /* Accent color for radio button */
+        }
+
+        .answer-option .answer-text-wrapper {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            padding-right: 10px; /* Space for icon */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .answer-option .answer-text-wrapper:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(225, 68, 52, 0.3);
+        }
+
+        .answer-option input[type="text"].answer-text-input {
+            flex-grow: 1; /* Allow answer text input to take available space */
+            width: auto; /* Override calc(100% - 20px) from general input rule */
+            margin-bottom: 0; /* Remove default margin */
+            border: none; /* Remove individual input border */
+            background-color: transparent; /* Transparent background */
+            padding: 12px;
+        }
+
+        .answer-option .edit-icon {
+            cursor: pointer;
+            color: var(--text-color-muted);
+            padding: 5px;
+            transition: color 0.2s ease;
+        }
+
+        .answer-option .edit-icon:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Button Styling */
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease; /* Smooth transitions for hover effects */
+            text-align: center;
+            text-decoration: none; /* Remove underline for links acting as buttons */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Button shadow */
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color); /* Primary accent color */
+            color: var(--text-color-light); /* White text */
+        }
+
+        .btn-primary:hover {
+            background-color: #ff6b81; /* Lighter accent on hover (keeping original for now, can adjust to palette) */
+            transform: translateY(-2px); /* Slight lift effect */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+        }
+
+        .btn-secondary {
+            background-color: var(--background-medium); /* Darker blue for secondary buttons */
+            color: var(--text-color-light);
+            border: 1px solid var(--input-border); /* Border for secondary buttons */
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--background-light); /* Slightly darker on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-danger {
+            background-color: var(--error-color); /* Red for delete buttons */
+            color: var(--text-color-light);
+            position: absolute; /* Position relative to parent .question-item */
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 5px;
+            box-shadow: none; /* No shadow by default */
+            opacity: 0.8; /* Slightly transparent */
+        }
+
+        .btn-danger:hover {
+            background-color: #ff4757; /* Lighter red on hover (keeping original for now, can adjust to palette) */
+            opacity: 1;
+            transform: translateY(-1px); /* Slight lift */
+        }
+
+        .button-group {
+            display: flex; /* Use flexbox for button alignment */
+            justify-content: flex-end; /* Align buttons to the right */
+            margin-top: 30px;
+            gap: 15px; /* Gap between buttons */
+        }
+
+        .button-group .btn {
+            flex-grow: 0; /* Prevent buttons from growing */
+        }
+
+        /* Quiz Link Display Section */
+        #quiz-link-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--background-light);
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeIn 0.8s ease-out;
+            display: none; /* Hidden by default, shown after quiz creation */
+        }
+
+        #quiz-link-container p {
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: var(--text-color-muted);
+        }
+
+        #quiz-link {
+            display: block; /* Make the link a block element */
+            background-color: var(--input-bg);
+            color: var(--primary-color);
+            padding: 15px;
+            border-radius: 8px;
+            word-break: break-all; /* Break long words to prevent overflow */
+            font-size: 17px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2); /* Inner shadow for link box */
+            margin-bottom: 15px;
+        }
+
+        #quiz-link:hover {
+            background-color: var(--input-border);
+            color: var(--secondary-color);
+        }
+
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .share-buttons .btn {
+            padding: 10px 20px;
+            font-size: 15px;
+        }
+
+        /* Message Box for notifications */
+        .message-box {
+            position: fixed; /* Fixed position relative to viewport */
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%); /* Center horizontally */
+            background-color: var(--primary-color); /* Accent color */
+            color: var(--text-color-light);
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000; /* Ensure it's on top */
+            opacity: 0; /* Hidden by default */
+            visibility: hidden; /* Hidden by default */
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; /* Smooth transition for show/hide */
+            font-weight: 600;
+        }
+
+        .message-box.show {
+            opacity: 1; /* Show when 'show' class is added */
+            visibility: visible;
+            transform: translateX(-50%) translateY(0); /* Slide down slightly */
+        }
+
+        .message-box.error {
+            background-color: var(--error-color); /* Red for error messages */
+        }
+
+        /* Footer Styling */
+        .footer {
+            margin-top: auto; /* Push footer to the bottom */
+            padding: 15px 20px;
+            color: var(--text-color-muted);
+            font-size: 14px;
+            text-align: center;
+            width: 100%;
+            max-width: 700px; /* Match container width */
+            box-sizing: border-box;
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px; /* Add some margin on smaller screens */
+            }
+            h1 {
+                font-size: 28px; /* Adjust heading size */
+            }
+            .btn {
+                padding: 10px 20px;
+                font-size: 15px;
+            }
+            .button-group {
+                flex-direction: column; /* Stack buttons vertically */
+            }
+            .button-group .btn {
+                width: 100%; /* Full width for stacked buttons */
+            }
+            .share-buttons {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            input[type="text"],
+            textarea {
+                padding: 10px;
+                font-size: 14px;
+            }
+            .btn-danger {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Your Friendship Dare Quiz</h1>
+        <form id="quiz-form">
+            <div class="form-group">
+                <label for="creator-name">Your Name:</label>
+                <input type="text" id="creator-name" placeholder="E.g., John" required>
+            </div>
+            <div class="form-group">
+                <label for="quiz-title">Quiz Title (Optional):</label>
+                <input type="text" id="quiz-title" placeholder="E.g., How well do you know Sanuka?">
+            </div>
+
+            <div id="questions-container">
+                <!-- Popular question input fields will be dynamically added here by JavaScript -->
+            </div>
+
+            <div class="button-group">
+                <button type="button" id="add-popular-question-btn" class="btn btn-secondary">Add More Popular Question</button>
+                <button type="submit" class="btn btn-primary">Create Quiz</button>
+            </div>
+        </form>
+
+        <div id="quiz-link-container">
+            <p>Your quiz has been created! Share this link with your friends:</p>
+            <a id="quiz-link" href="#" target="_blank"></a>
+            <div class="share-buttons">
+                <button class="btn btn-secondary" onclick="copyQuizLink()">Copy Link</button>
+                <button class="btn btn-secondary" onclick="shareOnWhatsApp()">Share on WhatsApp</button>
+                <button class="btn btn-primary" id="view-results-btn">View Results</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message box for user notifications -->
+    <div id="message-box" class="message-box"></div>
+
+    <footer class="footer">
+        Infinity Software Solutions by Sanuka Nimnal &copy; 2020
+    </footer>
+
+    <script>
+        // Get references to DOM elements
+        const questionsContainer = document.getElementById('questions-container');
+        const addPopularQuestionBtn = document.getElementById('add-popular-question-btn');
+        const quizForm = document.getElementById('quiz-form');
+        const quizLinkContainer = document.getElementById('quiz-link-container');
+        const quizLinkElem = document.getElementById('quiz-link');
+        const viewResultsBtn = document.getElementById('view-results-btn');
+        const messageBox = document.getElementById('message-box');
+
+        let questionCounter = 0; // Counter to keep track of question numbers
+        let popularQuestionIndex = 0; // Index to cycle through popular questions
+
+        // Array of popular questions with default answers
+        const popularQuestions = [
+            {
+                q: "What's my favorite color?",
+                answers: ["Red", "Blue", "Green", "Yellow"],
+                correct: "Blue"
+            },
+            {
+                q: "What's my favorite sport?",
+                answers: ["Football", "Basketball", "Cricket", "Tennis"],
+                correct: "Cricket"
+            },
+            {
+                q: "What's my favorite subject?",
+                answers: ["Math", "Science", "History", "Art"],
+                correct: "Science"
+            },
+            {
+                q: "What's my favorite hobby?",
+                answers: ["Reading", "Gaming", "Hiking", "Cooking"],
+                correct: "Gaming"
+            },
+            {
+                q: "What's my favorite food?",
+                answers: ["Pizza", "Pasta", "Sushi", "Tacos"],
+                correct: "Pizza"
+            },
+            {
+                q: "What's my favorite drink?",
+                answers: ["Coffee", "Tea", "Juice", "Soda"],
+                correct: "Tea"
+            },
+            {
+                q: "Who is my favorite actor?",
+                answers: ["Tom Hanks", "Leonardo DiCaprio", "Meryl Streep", "Scarlett Johansson"],
+                correct: "Leonardo DiCaprio"
+            },
+            {
+                q: "Who is my favorite singer?",
+                answers: ["Taylor Swift", "Ed Sheeran", "Adele", "Beyoncé"],
+                correct: "Adele"
+            },
+            {
+                q: "What's my favorite car brand?",
+                answers: ["Toyota", "BMW", "Mercedes-Benz", "Tesla"],
+                correct: "Tesla"
+            },
+            {
+                q: "What's my favorite animal?",
+                answers: ["Dog", "Cat", "Elephant", "Dolphin"],
+                correct: "Cat"
+            }
+        ];
+
+        /**
+         * Displays a temporary message to the user.
+         * @param {string} message - The message text to display.
+         * @param {string} type - The type of message ('success' or 'error') to determine color.
+         */
+        function showMessage(message, type = 'success') {
+            messageBox.textContent = message; // Set message text
+            messageBox.className = 'message-box show'; // Add 'show' class to make it visible
+            if (type === 'error') {
+                messageBox.classList.add('error'); // Add 'error' class for red background
+            } else {
+                messageBox.classList.remove('error'); // Remove 'error' class for default background
+            }
+
+            // Hide the message after 3 seconds
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
+
+        /**
+         * Dynamically adds a new question input field to the form.
+         * This function is now specifically tailored for popular questions with editable answers.
+         * @param {object} data - Data for the popular question (q, answers, correct).
+         */
+        function addPopularQuestion(data) {
+            questionCounter++; // Increment question counter
+            const questionDiv = document.createElement('div');
+            questionDiv.classList.add('question-item'); // Add class for styling
+            questionDiv.setAttribute('data-question-type', 'popular'); // Mark question type
+
+            let innerHTML = `
+                <h3>Question ${questionCounter}</h3>
+                <div class="form-group">
+                    <label for="question-${questionCounter}">Question:</label>
+                    <input type="text" id="question-${questionCounter}" class="question-input" value="${data.q || ''}" placeholder="E.g., What's my favorite color?" required>
+                </div>
+                <div class="answers-group">
+                    <label>Answers (Select and Edit):</label>
+                    <input type="hidden" id="correct-answer-${questionCounter}" class="correct-answer-input" value="${data.correct || ''}">
+            `;
+            data.answers.forEach((ans, idx) => {
+                const isChecked = (ans === data.correct) ? 'checked' : '';
+                innerHTML += `
+                    <div class="answer-option">
+                        <input type="radio" id="q${questionCounter}-ans${idx}" name="q${questionCounter}-correct-ans" value="${ans}" class="correct-option-radio" ${isChecked}>
+                        <div class="answer-text-wrapper">
+                            <input type="text" id="q${questionCounter}-ans-text-${idx}" class="answer-text-input" value="${ans}" readonly>
+                            <i class="fas fa-pencil-alt edit-icon" data-target-id="q${questionCounter}-ans-text-${idx}"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            innerHTML += `</div>`; // Close answers-group
+
+            innerHTML += `<button type="button" class="btn btn-danger remove-question-btn">Remove</button>`;
+            questionDiv.innerHTML = innerHTML;
+            questionsContainer.appendChild(questionDiv); // Append the new question div
+
+            // Add event listener to the 'Remove' button for this specific question
+            questionDiv.querySelector('.remove-question-btn').addEventListener('click', () => {
+                questionsContainer.removeChild(questionDiv); // Remove the question div
+                updateQuestionNumbers(); // Re-number remaining questions
+            });
+
+            // Add event listeners for popular question specific inputs
+            const correctAnsInput = questionDiv.querySelector(`#correct-answer-${questionCounter}`);
+            const radioButtons = questionDiv.querySelectorAll('.correct-option-radio');
+            const answerTextInputs = questionDiv.querySelectorAll('.answer-text-input');
+            const editIcons = questionDiv.querySelectorAll('.edit-icon');
+
+            // Listener for radio button changes
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (radio.checked) {
+                        // Find the corresponding text input and set the correct answer
+                        const textInputId = radio.id.replace('ans', 'ans-text-');
+                        const correspondingTextInput = questionDiv.querySelector(`#${textInputId}`);
+                        if (correspondingTextInput) {
+                            correctAnsInput.value = correspondingTextInput.value;
+                        }
+                    }
+                });
+            });
+
+            // Listener for answer text input changes
+            answerTextInputs.forEach((textInput, idx) => {
+                textInput.addEventListener('input', () => {
+                    const correspondingRadio = questionDiv.querySelector(`#q${questionCounter}-ans${idx}`);
+                    if (correspondingRadio && correspondingRadio.checked) {
+                        // If this answer is currently selected as correct, update the hidden input
+                        correctAnsInput.value = textInput.value;
+                    }
+                    // Also update the radio button's value, so it matches the new text if selected later
+                    correspondingRadio.value = textInput.value;
+                });
+            });
+
+            // Listener for edit icons
+            editIcons.forEach(icon => {
+                icon.addEventListener('click', (event) => {
+                    const targetId = event.target.dataset.targetId;
+                    const targetInput = questionDiv.querySelector(`#${targetId}`);
+                    if (targetInput) {
+                        targetInput.readOnly = !targetInput.readOnly; // Toggle readonly
+                        if (!targetInput.readOnly) {
+                            targetInput.focus(); // Focus the input when editable
+                        }
+                    }
+                });
+            });
+
+            // Ensure initial correct answer is set if a radio is checked by default
+            const initialCheckedRadio = questionDiv.querySelector('.correct-option-radio:checked');
+            if (initialCheckedRadio) {
+                correctAnsInput.value = initialCheckedRadio.value;
+            }
+        }
+
+        /**
+         * Loads all popular questions into the form on page load.
+         */
+        function loadAllPopularQuestions() {
+            popularQuestions.forEach(q => {
+                addPopularQuestion(q);
+            });
+            popularQuestionIndex = popularQuestions.length; // Set index to prevent adding duplicates initially
+        }
+
+        /**
+         * Updates the numbering of questions after one is removed.
+         */
+        function updateQuestionNumbers() {
+            const questionItems = questionsContainer.querySelectorAll('.question-item');
+            questionCounter = 0; // Reset counter
+            questionItems.forEach((item, index) => {
+                questionCounter = index + 1; // Update counter based on new index
+                item.querySelector('h3').textContent = `Question ${questionCounter}`; // Update heading
+
+                // Update IDs and names for inputs within the question item
+                item.querySelector('.question-input').id = `question-${questionCounter}`;
+                item.querySelector('.question-input').name = `question-${questionCounter}`;
+
+                const correctAnsInput = item.querySelector('.correct-answer-input');
+                if (correctAnsInput) {
+                    correctAnsInput.id = `correct-answer-${questionCounter}`;
+                }
+                const radioButtons = item.querySelectorAll('.correct-option-radio');
+                const answerTextInputs = item.querySelectorAll('.answer-text-input');
+                radioButtons.forEach((radio, idx) => {
+                    radio.id = `q${questionCounter}-ans${idx}`;
+                    radio.name = `q${questionCounter}-correct-ans`; // Update name for radio group
+                });
+                answerTextInputs.forEach((textInput, idx) => {
+                    textInput.id = `q${questionCounter}-ans-text-${idx}`;
+                });
+                // Update data-target-id for edit icons
+                item.querySelectorAll('.edit-icon').forEach((icon, idx) => {
+                    icon.dataset.targetId = `q${questionCounter}-ans-text-${idx}`;
+                });
+            });
+        }
+
+        // Load all popular questions when the page loads
+        document.addEventListener('DOMContentLoaded', loadAllPopularQuestions);
+
+        // Event listener for the "Add More Popular Question" button
+        addPopularQuestionBtn.addEventListener('click', () => {
+            if (popularQuestionIndex < popularQuestions.length) {
+                addPopularQuestion(popularQuestions[popularQuestionIndex]);
+                popularQuestionIndex++;
+            } else {
+                showMessage('All popular questions have been added!', 'info');
+            }
+        });
+
+        // Event listener for the quiz form submission
+        quizForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent default form submission behavior
+
+            // Get creator's name and quiz title, trim whitespace
+            const creator = document.getElementById('creator-name').value.trim();
+            const quizTitle = document.getElementById('quiz-title').value.trim();
+            const questions = []; // Array to store question objects
+
+            // Get all question items
+            const questionItems = document.querySelectorAll('.question-item');
+
+            // Validate if at least one question exists
+            if (questionItems.length === 0) {
+                showMessage('Please add at least one question.', 'error');
+                return;
+            }
+
+            // Iterate through question items to build the questions array
+            for (let i = 0; i < questionItems.length; i++) {
+                const item = questionItems[i];
+                const questionInput = item.querySelector('.question-input');
+                const questionText = questionInput.value.trim();
+
+                // Validate if question text is not empty
+                if (!questionText) {
+                    showMessage(`Question ${i + 1} cannot be empty.`, 'error');
+                    return;
+                }
+
+                const question = { q: questionText };
+
+                const selectedCorrectAnswerInput = item.querySelector('.correct-answer-input');
+                const selectedCorrectAnswer = selectedCorrectAnswerInput ? selectedCorrectAnswerInput.value.trim() : '';
+
+                if (!selectedCorrectAnswer) {
+                    showMessage(`Please select or provide a correct answer for Question ${i + 1}.`, 'error');
+                    return;
+                }
+                question.correct = selectedCorrectAnswer;
+
+                // Collect all answer options for the current question
+                const answers = [];
+                item.querySelectorAll('.answer-text-input').forEach(input => {
+                    const answerText = input.value.trim();
+                    if (answerText) { // Only add non-empty answers
+                        answers.push(answerText);
+                    }
+                });
+
+                if (answers.length < 2) { // Ensure at least two options for MCQ
+                    showMessage(`Please provide at least two answer options for Question ${i + 1}.`, 'error');
+                    return;
+                }
+                question.answers = answers; // Add the answers array to the question object
+
+                questions.push(question);
+            }
+
+            // Validate if creator's name is provided
+            if (!creator) {
+                showMessage('Please enter your name.', 'error');
+                return;
+            }
+
+            // Construct the quiz data object
+            const quizData = {
+                creator: creator,
+                quizTitle: quizTitle || `Quiz by ${creator}`, // Use default title if none provided
+                questions: questions
+            };
+
+            try {
+                // Send quiz data to the backend using fetch API
+                const response = await fetch('/create-quiz', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // Specify content type as JSON
+                    },
+                    body: JSON.stringify(quizData) // Convert JavaScript object to JSON string
+                });
+
+                const result = await response.json(); // Parse the JSON response from the server
+
+                if (result.success) {
+                    // Construct the full quiz URL
+                    const quizUrl = `${window.location.origin}/quiz.html?id=${result.quizId}`;
+                    const resultsUrl = `${window.location.origin}/result.html?id=${result.quizId}`;
+
+                    quizLinkElem.href = quizUrl; // Set link href for taking quiz
+                    quizLinkElem.textContent = quizUrl; // Set link text
+                    quizLinkContainer.style.display = 'block'; // Show the link container
+
+                    // Set up the View Results button
+                    viewResultsBtn.onclick = () => {
+                        window.open(resultsUrl, '_blank'); // Open results in a new tab
+                    };
+
+                    showMessage('Quiz created successfully!', 'success');
+                    // Reset the form for creating a new quiz
+                    quizForm.reset();
+                    questionsContainer.innerHTML = ''; // Clear all dynamically added questions
+                    questionCounter = 0; // Reset question counter
+                    popularQuestionIndex = 0; // Reset popular question index
+                    loadAllPopularQuestions(); // Load all popular questions again for new quiz creation
+                } else {
+                    showMessage(`Error creating quiz: ${result.error || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Network error or server issue. Please try again.', 'error');
+            }
+        });
+
+        /**
+         * Copies the generated quiz link to the clipboard.
+         */
+        function copyQuizLink() {
+            const linkText = quizLinkElem.textContent; // Get the text content of the link
+            const tempInput = document.createElement('textarea'); // Create a temporary textarea
+            tempInput.value = linkText; // Set its value to the link text
+            document.body.appendChild(tempInput); // Append to body (must be in DOM to select)
+            tempInput.select(); // Select the text
+            document.execCommand('copy'); // Copy the selected text
+            document.body.removeChild(tempInput); // Remove the temporary textarea
+            showMessage('Link copied to clipboard!'); // Show confirmation message
+        }
+
+        /**
+         * Shares the generated quiz link on WhatsApp.
+         */
+        function shareOnWhatsApp() {
+            const quizUrl = quizLinkElem.href;
+            const creatorName = document.getElementById('creator-name').value.trim() || 'a friend';
+            const quizTitle = document.getElementById('quiz-title').value.trim() || 'Friendship Dare Quiz';
+            const message = `⚡ *Hey! I just created a fun quiz. See how well you know me! Take the dare here:*    🔥${quizUrl}🔥`;
+            const whatsappLink = `whatsapp://send?text=${encodeURIComponent(message)}`;
+            window.open(whatsappLink, '_blank');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take the Friendship Dare Quiz</title>
+        <link rel="icon" type="image/x-icon" href="infinity.png">
+
+    <!-- Link to Google Fonts for 'Inter' font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Define CSS Variables for the new color palette */
+        :root {
+            --primary-color: #E14434; /* Strong Red - for main buttons, important headings, accents, correct answers */
+            --secondary-color: #5EABD6; /* Light Blue - for secondary buttons, borders, hover effects, question text */
+            --text-color-light: #FEFBC7; /* Cream - for main body text, input text */
+            --text-color-muted: rgba(254, 251, 199, 0.7); /* Muted Cream - for labels, subheadings */
+            --background-dark: #1a1a2e; /* Existing dark blue */
+            --background-medium: #0f3460; /* Existing slightly lighter dark blue for containers */
+            --background-light: #16213e; /* Existing darker blue for quiz sections/question items */
+            --input-bg: #2c324a; /* Existing dark input background */
+            --input-border: #3e445b; /* Existing input border */
+            --error-color: #FFB4B4; /* Light Red/Pink - for error messages, delete buttons */
+        }
+
+        /* General Body Styles */
+        body {
+            font-family: 'Inter', sans-serif; /* Apply Inter font */
+            background-color: var(--background-dark); /* Dark background color */
+            color: var(--text-color-light); /* Light text color */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column; /* Stack content and footer vertically */
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Align content to the top */
+            min-height: 100vh; /* Full viewport height */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+            background-image: linear-gradient(135deg, var(--background-dark) 0%, var(--background-light) 100%); /* Subtle gradient background */
+        }
+
+        /* Container for the quiz */
+        .container {
+            background-color: var(--background-medium); /* Slightly lighter dark blue for the container */
+            padding: 30px;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); /* Deep shadow for depth */
+            width: 100%;
+            max-width: 600px; /* Max width for readability on larger screens */
+            box-sizing: border-box;
+            animation: fadeIn 0.8s ease-out; /* Fade-in animation on load */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+            margin-bottom: 20px; /* Space before footer */
+        }
+
+        /* Keyframe animation for fade-in effect */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color); /* Accent color for headings */
+            margin-bottom: 20px;
+            font-weight: 700; /* Bold font weight */
+            letter-spacing: 1px; /* Spacing between letters */
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Text shadow for pop */
+        }
+
+        h2 {
+            font-size: 24px;
+            color: var(--text-color-muted); /* Muted color for sub-headings */
+            margin-top: 0;
+        }
+
+        p {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 18px;
+            color: var(--text-color-muted); /* Slightly lighter muted text */
+        }
+
+        /* Quiz Section Styling */
+        #quiz-section {
+            background-color: var(--background-light); /* Darker blue for the quiz content area */
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.5s ease-out; /* Slide-in animation for quiz content */
+        }
+
+        /* Keyframe animation for slide-in effect */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        #question-text {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--text-color-light);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color-muted);
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px); /* Full width minus padding */
+            padding: 12px;
+            border: 1px solid var(--input-border); /* Border color */
+            border-radius: 8px; /* Rounded input fields */
+            background-color: var(--input-bg); /* Darker background for inputs */
+            color: var(--text-color-light); /* Light text color for input */
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for focus */
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color); /* Accent color border on focus */
+            box-shadow: 0 0 0 3px rgba(225, 68, 52, 0.3); /* Glow effect on focus */
+            outline: none; /* Remove default outline */
+        }
+
+        /* MCQ Options Styling */
+        .mcq-options {
+            margin-top: 15px;
+        }
+
+        .mcq-option-item {
+            display: flex;
+            align-items: center;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .mcq-option-item:hover {
+            background-color: var(--background-medium);
+            border-color: var(--secondary-color);
+        }
+
+        .mcq-option-item input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            accent-color: var(--secondary-color); /* Light blue for radio button */
+            cursor: pointer;
+        }
+
+        .mcq-option-item label {
+            flex-grow: 1;
+            margin-bottom: 0;
+            cursor: pointer;
+            color: var(--text-color-light);
+            font-weight: 400; /* Regular font weight for option text */
+        }
+
+        /* Button Styling */
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease; /* Smooth transitions for hover effects */
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Button shadow */
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color); /* Primary accent color */
+            color: var(--text-color-light); /* White text */
+        }
+
+        .btn-primary:hover {
+            background-color: #ff6b81; /* Lighter accent on hover (keeping original for now, can adjust to palette) */
+            transform: translateY(-2px); /* Slight lift effect */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+        }
+
+        .btn-secondary {
+            background-color: var(--background-medium); /* Darker blue for secondary buttons */
+            color: var(--text-color-light);
+            border: 1px solid var(--input-border); /* Border for secondary buttons */
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--background-light); /* Slightly darker on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .button-group {
+            display: flex; /* Use flexbox for button alignment */
+            justify-content: space-between; /* Space out buttons */
+            margin-top: 30px;
+            gap: 15px; /* Gap between buttons */
+        }
+
+        .button-group .btn {
+            flex-grow: 1; /* Allow buttons to grow and fill space */
+        }
+
+        /* Message Box for notifications */
+        .message-box {
+            position: fixed; /* Fixed position relative to viewport */
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%); /* Center horizontally */
+            background-color: var(--primary-color); /* Accent color */
+            color: var(--text-color-light);
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000; /* Ensure it's on top */
+            opacity: 0; /* Hidden by default */
+            visibility: hidden; /* Hidden by default */
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; /* Smooth transition for show/hide */
+            font-weight: 600;
+        }
+
+        .message-box.show {
+            opacity: 1; /* Show when 'show' class is added */
+            visibility: visible;
+            transform: translateX(-50%) translateY(0); /* Slide down slightly */
+        }
+
+        .message-box.error {
+            background-color: var(--error-color); /* Red for error messages */
+        }
+
+        /* Initial loading state message */
+        #loading-message {
+            text-align: center;
+            font-size: 20px;
+            color: var(--text-color-muted);
+            margin-top: 50px;
+        }
+
+        #quiz-content {
+            display: none; /* Hidden by default until quiz data is loaded */
+        }
+
+        /* Quiz completion message styling */
+        #quiz-complete-message {
+            text-align: center;
+            padding: 30px;
+            background-color: var(--background-light);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none; /* Hidden by default until quiz is completed */
+            animation: fadeIn 0.8s ease-out; /* Fade-in animation */
+        }
+
+        #quiz-complete-message h3 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        #quiz-complete-message p {
+            font-size: 18px;
+            color: var(--text-color-muted);
+            margin-bottom: 20px;
+        }
+
+        #quiz-complete-message .btn {
+            margin-top: 10px;
+        }
+
+        /* Footer Styling */
+        .footer {
+            margin-top: auto; /* Push footer to the bottom */
+            padding: 15px 20px;
+            color: var(--text-color-muted);
+            font-size: 14px;
+            text-align: center;
+            width: 100%;
+            max-width: 600px; /* Match container width */
+            box-sizing: border-box;
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            h1, h2 {
+                font-size: 28px;
+            }
+            #question-text {
+                font-size: 18px;
+            }
+            .btn {
+                padding: 10px 20px;
+                font-size: 15px;
+            }
+            .button-group {
+                flex-direction: column; /* Stack buttons vertically */
+            }
+            .button-group .btn {
+                width: 100%; /* Full width for stacked buttons */
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            h1, h2 {
+                font-size: 24px;
+            }
+            input[type="text"] {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loading-message">Loading Quiz...</div>
+        <div id="quiz-content">
+            <h1 id="quiz-title"></h1>
+            <h2 id="creator-name"></h2>
+            <p>Answer the questions about <span id="creator-name-inline"></span>!</p>
+
+            <div id="quiz-section">
+                <div class="form-group">
+                    <label for="friend-name">Your Name:</label>
+                    <input type="text" id="friend-name" placeholder="E.g., John" required>
+                </div>
+                <div id="question-display">
+                    <p id="question-text"></p>
+                    <!-- MCQ options will be dynamically inserted here -->
+                    <div id="mcq-options-container" class="mcq-options"></div>
+                </div>
+                <div class="button-group">
+                    <button type="button" id="prev-question-btn" class="btn btn-secondary">Previous</button>
+                    <button type="button" id="next-question-btn" class="btn btn-primary">Next</button>
+                    <button type="button" id="submit-quiz-btn" class="btn btn-primary">Submit Quiz</button>
+                </div>
+            </div>
+        </div>
+        <div id="quiz-complete-message">
+            <h3>Quiz Completed!</h3>
+            <p>Thank you for taking the quiz. Your answers have been submitted.</p>
+            <p>Your score: <span id="final-score"></span></p>
+            <button class="btn btn-primary" onclick="window.location.href='/'">Create Your Own Quiz</button>
+        </div>
+    </div>
+
+    <!-- Message box for user notifications -->
+    <div id="message-box" class="message-box"></div>
+
+    <footer class="footer">
+        Infinity Software Solutions by Sanuka Nimnal &copy; 2020
+    </footer>
+
+    <script>
+        // Get quiz ID from URL query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const quizId = urlParams.get('id');
+
+        // Get references to DOM elements
+        const loadingMessage = document.getElementById('loading-message');
+        const quizContent = document.getElementById('quiz-content');
+        const quizTitleElem = document.getElementById('quiz-title');
+        const creatorNameElem = document.getElementById('creator-name');
+        const creatorNameInlineElem = document.getElementById('creator-name-inline');
+        const questionTextElem = document.getElementById('question-text');
+        const mcqOptionsContainer = document.getElementById('mcq-options-container'); // New element for MCQ options
+        const friendNameInput = document.getElementById('friend-name');
+        const prevQuestionBtn = document.getElementById('prev-question-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const submitQuizBtn = document.getElementById('submit-quiz-btn');
+        const quizCompleteMessage = document.getElementById('quiz-complete-message');
+        const finalScoreElem = document.getElementById('final-score');
+        const messageBox = document.getElementById('message-box');
+
+        let quizData = null; // Stores the loaded quiz data
+        let currentQuestionIndex = 0; // Tracks the current question being displayed
+        let friendAnswers = []; // Array to store friend's answers for each question
+
+        /**
+         * Displays a temporary message to the user.
+         * @param {string} message - The message text to display.
+         * @param {string} type - The type of message ('success' or 'error') to determine color.
+         */
+        function showMessage(message, type = 'success') {
+            messageBox.textContent = message;
+            messageBox.className = 'message-box show'; // Add 'show' class to make it visible
+            if (type === 'error') {
+                messageBox.classList.add('error'); // Add 'error' class for red background
+            } else {
+                messageBox.classList.remove('error'); // Remove 'error' class for default background
+            }
+
+            // Hide the message after 3 seconds
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
+
+        /**
+         * Fetches and loads the quiz data from the server.
+         */
+        async function loadQuiz() {
+            if (!quizId) {
+                loadingMessage.textContent = 'Error: Quiz ID not provided in the URL.';
+                showMessage('Error: Quiz ID not provided.', 'error');
+                return;
+            }
+
+            try {
+                // Fetch quiz data from the backend
+                const response = await fetch(`/quiz/${quizId}`);
+                if (!response.ok) {
+                    // If response is not OK (e.g., 404), parse error message
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to load quiz');
+                }
+                quizData = await response.json(); // Parse the JSON response
+
+                // Populate quiz details on the page
+                quizTitleElem.textContent = quizData.quizTitle;
+                creatorNameElem.textContent = `A quiz by ${quizData.creator}`;
+                creatorNameInlineElem.textContent = quizData.creator;
+
+                displayQuestion(); // Display the first question
+                loadingMessage.style.display = 'none'; // Hide loading message
+                quizContent.style.display = 'block'; // Show quiz content
+            } catch (error) {
+                console.error('Error loading quiz:', error);
+                loadingMessage.textContent = `Error loading quiz: ${error.message}. Please check the quiz ID.`;
+                showMessage(`Error loading quiz: ${error.message}`, 'error');
+            }
+        }
+
+        /**
+         * Displays the current question and manages button visibility.
+         */
+        function displayQuestion() {
+            // Handle cases where quiz data or questions are missing
+            if (!quizData || !quizData.questions || quizData.questions.length === 0) {
+                questionTextElem.textContent = 'No questions found for this quiz.';
+                mcqOptionsContainer.innerHTML = ''; // Clear options
+                // Hide all navigation/submit buttons
+                nextQuestionBtn.style.display = 'none';
+                prevQuestionBtn.style.display = 'none';
+                submitQuizBtn.style.display = 'none';
+                return;
+            }
+
+            const currentQuestion = quizData.questions[currentQuestionIndex];
+            questionTextElem.textContent = `Q${currentQuestionIndex + 1}: ${currentQuestion.q}`;
+
+            // Clear previous MCQ options
+            mcqOptionsContainer.innerHTML = '';
+
+            // Generate MCQ options
+            if (currentQuestion.answers && currentQuestion.answers.length > 0) {
+                currentQuestion.answers.forEach((answer, index) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.classList.add('mcq-option-item');
+
+                    const radioInput = document.createElement('input');
+                    radioInput.type = 'radio';
+                    radioInput.id = `q${currentQuestionIndex}-ans-${index}`;
+                    radioInput.name = `q${currentQuestionIndex}-answer`; // Group radios by question
+                    radioInput.value = answer; // Store the answer text as value
+
+                    // Check if this option was previously selected by the user
+                    if (friendAnswers[currentQuestionIndex] === answer) {
+                        radioInput.checked = true;
+                    }
+
+                    const label = document.createElement('label');
+                    label.setAttribute('for', `q${currentQuestionIndex}-ans-${index}`);
+                    label.textContent = answer;
+
+                    optionDiv.appendChild(radioInput);
+                    optionDiv.appendChild(label);
+                    mcqOptionsContainer.appendChild(optionDiv);
+
+                    // Add event listener to the option div to toggle radio on click
+                    optionDiv.addEventListener('click', () => {
+                        radioInput.checked = true;
+                    });
+                });
+            } else {
+                // Fallback if answers array is missing (though index.html popular questions provide it)
+                mcqOptionsContainer.innerHTML = '<p>No options available for this question.</p>';
+            }
+
+            // Manage visibility of 'Previous' and 'Next' buttons
+            prevQuestionBtn.style.display = currentQuestionIndex > 0 ? 'inline-block' : 'none';
+            nextQuestionBtn.style.display = currentQuestionIndex < quizData.questions.length - 1 ? 'inline-block' : 'none';
+
+            // Manage visibility of 'Submit Quiz' button
+            if (currentQuestionIndex === quizData.questions.length - 1) {
+                nextQuestionBtn.style.display = 'none'; // Hide 'Next' on the last question
+                submitQuizBtn.style.display = 'inline-block'; // Show 'Submit' on the last question
+            } else {
+                submitQuizBtn.style.display = 'none'; // Hide 'Submit' on other questions
+            }
+        }
+
+        /**
+         * Saves the currently selected answer.
+         */
+        function saveCurrentAnswer() {
+            const selectedRadio = mcqOptionsContainer.querySelector(`input[name="q${currentQuestionIndex}-answer"]:checked`);
+            if (selectedRadio) {
+                friendAnswers[currentQuestionIndex] = selectedRadio.value;
+            } else {
+                friendAnswers[currentQuestionIndex] = ''; // No answer selected
+            }
+        }
+
+        // Event listener for the "Previous" button
+        prevQuestionBtn.addEventListener('click', () => {
+            saveCurrentAnswer(); // Save the current answer before navigating away
+            currentQuestionIndex--; // Decrement question index
+            displayQuestion(); // Display the previous question
+        });
+
+        // Event listener for the "Next" button
+        nextQuestionBtn.addEventListener('click', () => {
+            saveCurrentAnswer(); // Save the current answer
+            // Validate if an answer was selected
+            if (!friendAnswers[currentQuestionIndex]) {
+                showMessage('Please select an answer before proceeding.', 'error');
+                return;
+            }
+            currentQuestionIndex++; // Increment question index
+            displayQuestion(); // Display the next question
+        });
+
+        // Event listener for the "Submit Quiz" button
+        submitQuizBtn.addEventListener('click', async () => {
+            const friendName = friendNameInput.value.trim();
+            if (!friendName) {
+                showMessage('Please enter your name to submit the quiz.', 'error');
+                return;
+            }
+
+            // Save the answer for the last question before submission
+            saveCurrentAnswer();
+            if (!friendAnswers[currentQuestionIndex]) {
+                showMessage('Please select an answer for the last question.', 'error');
+                return;
+            }
+
+            try {
+                // Send submitted answers to the backend
+                const response = await fetch('/submit-answers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        quizId: quizId,
+                        friendName: friendName,
+                        answers: friendAnswers
+                    })
+                });
+
+                const result = await response.json(); // Parse the JSON response
+
+                if (result.success) {
+                    quizContent.style.display = 'none'; // Hide quiz questions
+                    quizCompleteMessage.style.display = 'block'; // Show completion message
+                    finalScoreElem.textContent = `${result.score} / ${quizData.questions.length}`; // Display score
+                    showMessage('Quiz submitted successfully!');
+                } else {
+                    showMessage(`Error submitting quiz: ${result.error || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting quiz:', error);
+                showMessage('Network error or server issue. Please try again.', 'error');
+            }
+        });
+
+        // Load the quiz when the page finishes loading
+        document.addEventListener('DOMContentLoaded', loadQuiz);
+    </script>
+</body>
+</html>

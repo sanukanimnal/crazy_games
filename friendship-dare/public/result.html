@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="infinity.png">
+
+    <title>Quiz Results</title>
+    <!-- Link to Google Fonts for 'Inter' font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Body Styles - Dark Theme */
+        body {
+            font-family: 'Inter', sans-serif; /* Apply Inter font */
+            background-color: #1a1a2e; /* Dark background color */
+            color: #e0e0e0; /* Light text color */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: flex-start; /* Align content to the top */
+            min-height: 100vh; /* Full viewport height */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+            background-image: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); /* Subtle gradient background */
+        }
+
+        /* Container for the results */
+        .container {
+            background-color: #0f3460; /* Slightly lighter dark blue for the container */
+            padding: 30px;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); /* Deep shadow for depth */
+            width: 100%;
+            max-width: 800px; /* Max width for readability on larger screens */
+            box-sizing: border-box;
+            animation: fadeIn 0.8s ease-out; /* Fade-in animation on load */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+        }
+
+        /* Keyframe animation for fade-in effect */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            color: #e94560; /* Accent color for headings */
+            margin-bottom: 10px;
+            font-weight: 700; /* Bold font weight */
+            letter-spacing: 1px; /* Spacing between letters */
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Text shadow for pop */
+        }
+
+        h2 {
+            text-align: center;
+            color: #b0b0b0; /* Muted color for sub-headings */
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        /* Loading/Error Message */
+        #loading-message {
+            text-align: center;
+            font-size: 20px;
+            color: #b0b0b0;
+            margin-top: 50px;
+        }
+
+        /* Answers List Container */
+        #answers-list {
+            margin-top: 30px;
+            display: grid; /* Use CSS Grid for layout */
+            gap: 20px; /* Gap between answer cards */
+        }
+
+        /* Individual Answer Card Styling */
+        .answer-card {
+            background-color: #16213e; /* Darker blue for answer cards */
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.5s ease-out; /* Slide-in animation for each card */
+            position: relative;
+        }
+
+        /* Keyframe animation for slide-in effect */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .answer-card h3 {
+            color: #e94560;
+            font-size: 22px;
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: flex; /* Use flexbox for friend name and score */
+            justify-content: space-between; /* Space them out */
+            align-items: center; /* Vertically align */
+        }
+
+        .answer-card h3 span {
+            background-color: #e94560; /* Accent background for score */
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 20px; /* Pill shape for score */
+            font-size: 16px;
+            font-weight: 700;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .answer-card ul {
+            list-style: none; /* Remove default list bullets */
+            padding: 0;
+            margin: 0;
+        }
+
+        .answer-card li {
+            background-color: #2c324a; /* Darker background for individual answers */
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s ease; /* Smooth transform on hover */
+        }
+
+        .answer-card li:last-child {
+            margin-bottom: 0; /* No bottom margin for the last list item */
+        }
+
+        .answer-card li:hover {
+            transform: translateY(-2px); /* Slight lift on hover */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+        }
+
+        .answer-card li p {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.5;
+            text-align: left; /* Override any center alignment from body p */
+        }
+
+        .answer-card li .question-text {
+            font-weight: 600;
+            color: #c0c0c0;
+        }
+
+        .answer-card li .friend-answer {
+            color: #8be9fd; /* Light blue for friend's answer */
+            font-style: italic;
+        }
+
+        .answer-card li .correct-answer {
+            color: #a4e400; /* Green for correct answer */
+            font-weight: 600;
+        }
+
+        .answer-card li .incorrect-answer {
+            color: #ff5555; /* Red for incorrect answer */
+            font-weight: 600;
+            text-decoration: line-through; /* Strikethrough for incorrect answers */
+        }
+
+        .answer-card li .correct-label,
+        .answer-card li .your-answer-label {
+            font-weight: 400;
+            font-size: 14px;
+            color: #909090;
+            display: block; /* Make labels block elements */
+            margin-top: 5px;
+        }
+
+        .no-answers-message {
+            text-align: center;
+            font-size: 18px;
+            color: #b0b0b0;
+            padding: 30px;
+            background-color: #16213e;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Message Box for notifications */
+        .message-box {
+            position: fixed; /* Fixed position relative to viewport */
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%); /* Center horizontally */
+            background-color: #e94560; /* Accent color */
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000; /* Ensure it's on top */
+            opacity: 0; /* Hidden by default */
+            visibility: hidden; /* Hidden by default */
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; /* Smooth transition for show/hide */
+            font-weight: 600;
+        }
+
+        .message-box.show {
+            opacity: 1; /* Show when 'show' class is added */
+            visibility: visible;
+            transform: translateX(-50%) translateY(0); /* Slide down slightly */
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            h1, h2 {
+                font-size: 28px;
+            }
+            .answer-card h3 {
+                font-size: 20px;
+            }
+            .answer-card h3 span {
+                font-size: 14px;
+                padding: 4px 10px;
+            }
+            .answer-card li p {
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            h1, h2 {
+                font-size: 24px;
+            }
+            .answer-card {
+                padding: 15px;
+            }
+            .answer-card h3 {
+                flex-direction: column; /* Stack friend name and score vertically */
+                align-items: flex-start; /* Align to the start */
+                gap: 5px;
+            }
+            .answer-card h3 span {
+                align-self: flex-end; /* Align score to the end within the column */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="quiz-title"></h1>
+        <h2 id="creator-name"></h2>
+
+        <div id="loading-message">Loading Results...</div>
+        <div id="answers-list">
+            <!-- Answer cards will be loaded here by JavaScript -->
+        </div>
+        <div id="no-answers-found" class="no-answers-message">
+            No answers submitted for this quiz yet. Share the quiz link with your friends!
+        </div>
+    </div>
+
+    <!-- Message box for user notifications -->
+    <div id="message-box" class="message-box"></div>
+
+    <script>
+        // Get quiz ID from URL query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const quizId = urlParams.get('id');
+
+        // Get references to DOM elements
+        const loadingMessage = document.getElementById('loading-message');
+        const quizTitleElem = document.getElementById('quiz-title');
+        const creatorNameElem = document.getElementById('creator-name');
+        const answersList = document.getElementById('answers-list');
+        const noAnswersFoundMessage = document.getElementById('no-answers-found');
+        const messageBox = document.getElementById('message-box');
+
+        // Initially hide the "no answers found" message
+        noAnswersFoundMessage.style.display = 'none';
+
+        /**
+         * Displays a temporary message to the user.
+         * @param {string} message - The message text to display.
+         * @param {string} type - The type of message ('success' or 'error') to determine color.
+         */
+        function showMessage(message, type = 'success') {
+            messageBox.textContent = message;
+            messageBox.className = 'message-box show'; // Add 'show' class to make it visible
+            if (type === 'error') {
+                messageBox.style.backgroundColor = '#d63031'; // Red for error messages
+            } else {
+                messageBox.style.backgroundColor = '#e94560'; // Accent color for success/info
+            }
+
+            // Hide the message after 3 seconds
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
+
+        /**
+         * Fetches and loads the quiz answers from the server.
+         */
+        async function loadAnswers() {
+            if (!quizId) {
+                loadingMessage.textContent = 'Error: Quiz ID not provided in the URL.';
+                showMessage('Error: Quiz ID not provided.', 'error');
+                return;
+            }
+
+            try {
+                // Fetch answers for the given quiz ID
+                const response = await fetch(`/answers/${quizId}`);
+                if (!response.ok) {
+                    // If response is not OK (e.g., 404), parse error message
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to load answers');
+                }
+                const result = await response.json(); // Parse the JSON response
+
+                loadingMessage.style.display = 'none'; // Hide loading message
+                quizTitleElem.textContent = result.quizTitle; // Set quiz title
+                creatorNameElem.textContent = `Results for quiz by ${result.creator}`; // Set creator name
+
+                if (result.answers && result.answers.length > 0) {
+                    // If answers exist, iterate and create answer cards
+                    result.answers.forEach(answerEntry => {
+                        const answerCard = document.createElement('div');
+                        answerCard.classList.add('answer-card'); // Add class for styling
+                        answerCard.innerHTML = `
+                            <h3>${answerEntry.friend} <span class="score">${answerEntry.score} / ${answerEntry.detailedAnswers.length}</span></h3>
+                            <ul>
+                                ${answerEntry.detailedAnswers.map(detail => `
+                                    <li>
+                                        <p class="question-text">Q: ${detail.question}</p>
+                                        <p><span class="your-answer-label">Your Answer:</span> <span class="friend-answer">${detail.friendAnswer}</span></p>
+                                        ${detail.correctAnswer !== 'N/A' ? // Only show correct answer if it exists
+                                            `<p><span class="correct-label">Correct Answer:</span> <span class="${detail.friendAnswer.toLowerCase() === detail.correctAnswer.toLowerCase() ? 'correct-answer' : 'incorrect-answer'}">${detail.correctAnswer}</span></p>`
+                                            : ''
+                                        }
+                                    </li>
+                                `).join('')} <!-- Join all list items into a single string -->
+                            </ul>
+                        `;
+                        answersList.appendChild(answerCard); // Append the created card to the list
+                    });
+                } else {
+                    // If no answers found, display the message
+                    noAnswersFoundMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading answers:', error);
+                loadingMessage.textContent = `Error loading results: ${error.message}. Please check the quiz ID.`;
+                showMessage(`Error loading results: ${error.message}`, 'error');
+            }
+        }
+
+        // Load answers when the page finishes loading
+        document.addEventListener('DOMContentLoaded', loadAnswers);
+    </script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+{
+  "how-well-you-know-sanuka": [
+    {
+      "friend": "Nimnal",
+      "answers": [
+        "blue",
+        "Cricket",
+        "No"
+      ],
+      "score": 1
+    }
+  ],
+  "how-well-you-know-sanuka-1": [
+    {
+      "friend": "12",
+      "answers": [
+        "No"
+      ],
+      "score": 0
+    }
+  ],
+  "how-well-you-know-me": [
+    {
+      "friend": "Nimnal",
+      "answers": [
+        "red",
+        "cricket",
+        "science",
+        "No",
+        "No",
+        "No",
+        "No",
+        "No",
+        "BMW",
+        "Cat"
+      ],
+      "score": 5
+    }
+  ],
+  "how-well-you-know-sanuka-3": [
+    {
+      "friend": "samuka",
+      "answers": [
+        "yellow",
+        "No",
+        "n",
+        "n",
+        "n",
+        "n",
+        "n",
+        "n",
+        "n",
+        "n"
+      ],
+      "score": 1
+    }
+  ],
+  "how-well-you-know-sanuka-4": [
+    {
+      "friend": "Nimnal",
+      "answers": [
+        "Blue",
+        "Cricket",
+        "Science",
+        "Gaming",
+        "Pizza",
+        "Tea",
+        "Leonardo DiCaprio",
+        "Adele",
+        "Tesla",
+        "Cat"
+      ],
+      "score": 10
+    }
+  ],
+  "how-well-you-know-1": [
+    {
+      "friend": "12",
+      "answers": [
+        "Blue",
+        "Basketball",
+        "Art",
+        "Cooking",
+        "Tacos",
+        "Soda",
+        "Scarlett Johansson",
+        "Beyoncé",
+        "Tesla",
+        "Dolphin"
+      ],
+      "score": 1
+    }
+  ]
+}
